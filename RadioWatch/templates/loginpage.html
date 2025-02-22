@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+{% block title %}{% if is_signup %}Register - Rolex Store{% else %}Login - Rolex Store{% endif %}{% endblock %}
+
+{% block content %}
+<div class="login-page">
+    <div class="container">
+        <div class="form-container">
+            {% if is_signup %}
+                <!-- Signup Form -->
+                <form id="signupForm" class="form active" method="POST">
+                    {% csrf_token %}
+                    <h2>Register</h2>
+                    {{ form.as_p }} <!-- Render the form fields for signup dynamically from Django -->
+                    <div class="strength-indicator">
+                        <div class="strength-bar" id="strengthBar"></div>
+                    </div>
+                    
+                    <div class="verify-mobile">
+                        <input type="text" placeholder="Verify Mobile Number (OTP)" required>
+                        <button type="button" id="sendOtpBtn">Send OTP</button>
+                    </div>
+                    <button type="submit">Register</button>
+                </form>
+            {% else %}
+                <!-- Login Form -->
+                <form id="loginForm" class="form active" method="POST">
+                    {% csrf_token %}
+                    <h2>Login</h2>
+                    <input type="text" name="username_or_email" placeholder="Username or Email" required>
+                    <input type="password" name="password" placeholder="Password" required>
+                    <div class="remember-me">
+                        <input type="checkbox" id="rememberMe" name="remember_me">
+                        <span><label for="rememberMe">Remember Me</label></span>
+                    </div>
+                    <button type="submit">Login</button>
+                    <p class="forgot-password"><a href="#">Forgot Password?</a></p>
+                    
+                    <!-- Redirect to Signup Page if the user isn't registered -->
+                    <p class="redirect-signup">Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
+                </form>
+            {% endif %}
+
+            {% if error %}
+                <p class="error">{{ error }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% block extra_styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login-styles.css' %}">
+{% endblock %}
+
+<script>
+    const passwordInput = document.querySelector('#signupForm input[type="password"]');
+    const strengthBar = document.getElementById('strengthBar');
+
+    if (passwordInput) {
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            strengthBar.style.width = `${strength * 25}%`;
+            if (strength === 0) {
+                strengthBar.style.backgroundColor = 'transparent';
+            } else if (strength < 3) {
+                strengthBar.style.backgroundColor = 'red';
+            } else {
+                strengthBar.style.backgroundColor = 'green';
+            }
+        });
+    }
+
+    const sendOtpBtn = document.getElementById('sendOtpBtn');
+    if (sendOtpBtn) {
+        sendOtpBtn.addEventListener('click', () => {
+            alert('OTP sent to your mobile number!');
+        });
+    }
+</script>
+{% endblock %}

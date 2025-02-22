@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+{% block title %}Home - Rolex Store{% endblock %}
+
+{% block content %}
+    <!-- Home Section -->
+    <section class="home" id="home">
+        <div class="home__container container grid">
+            <div class="home__img-bg">
+                <img src="{% static 'img/home.png' %}" alt="" class="home__img">
+            </div>
+
+            <div class="home__social">
+                <a href="https://www.facebook.com/" target="_blank" class="home__social-link">
+                    Facebook
+                </a>
+                <a href="https://twitter.com/" target="_blank" class="home__social-link">
+                    Twitter
+                </a>
+                <a href="https://www.instagram.com/" target="_blank" class="home__social-link">
+                    Instagram
+                </a>
+            </div>
+
+            <div class="home__data">
+                <h1 class="home__title">The Collection <br> RADIO WATCHES</h1>
+                <p class="home__description">
+                    Crafted with elegance and innovation, our watches are designed to elevate your style and reflect your individuality.
+                </p>
+
+                <div class="home__btns">
+                    <a href="#featured" class="button button--gray button--small">
+                        Our Brands
+                    </a>
+                    <a href="#new" class="button button--gray button--small">
+                        New Arrivals
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!--==================== STORY ====================-->
+    <section class="story section container">
+        <div class="story__container grid">
+            <div class="story__data">
+                <h2 class="section__title story__section-title">
+                    Our Story
+                </h2>
+
+                <h1 class="story__title">
+                    Inspirational Watch of <br> this year
+                </h1>
+
+                <p class="story__description">
+                    The latest and modern watches of this year, is available in various 
+                    presentations in this store, discover them now.
+                </p>
+
+                <a href="#" class="button button--small">Discover</a>
+            </div>
+
+            <div class="story__images">
+                <img src="{% static 'img/story.png' %}" alt="" class="story__img">
+                <div class="story__square"></div>
+            </div>
+        </div>
+    </section>
+<br>
+    
+    <!--==================== OUR BRANDS ====================-->
+    <section class="brands-container" id="featured">
+        <h2 class="section__title">
+            Our Brands
+        </h2>
+        <button class="scroll-button scroll-left">❮</button>
+
+        <div class="featured__container">
+            <article class="featured__card">
+                <a href="{% url 'product_by_brand' brand_name='Cartier' %}">
+                <img src="{% static 'img/cartier.png' %}" alt="" class="featured__img">
+                <div class="featured__data">
+                    <h3 class="featured__title">Cartier</h3>
+                </div>
+                </a>
+            </article>
+
+            <article class="featured__card">
+                <a href="{% url 'product_by_brand' brand_name='Cassio' %}">
+                <img src="{% static 'img/cassio.png' %}" alt="" class="featured__img">
+                <div class="featured__data">
+                    <h3 class="featured__title">Cassio</h3>
+                </div>
+                </a>
+            </article>
+
+            <article class="featured__card">
+                <a href="{% url 'product_by_brand' brand_name='Fossil' %}" >
+                <img src="{% static 'img/fossil.png' %}" alt="" class="featured__img">
+                <div class="featured__data">
+                    <h3 class="featured__title">Fossil</h3>
+                </div>
+                </a>
+            </article>
+
+            <article class="featured__card">
+                <a href="{% url 'product_by_brand' brand_name='Omega' %}">
+                <img src="{% static 'img/omega.png' %}" alt="" class="featured__img">
+                <div class="featured__data">
+                    <h3 class="featured__title">Omega</h3>
+                </div>
+                </a>
+            </article>
+
+            <article class="featured__card">
+                <a href="{% url 'product_by_brand' brand_name='Rolex' %}">
+                <img src="{% static 'img/rolex.png' %}" alt="" class="featured__img">
+                <div class="featured__data">
+                    <h3 class="featured__title">Rolex</h3>
+                </div>
+                </a>
+            </article>
+        </div>
+        <button class="scroll-button scroll-right">❯</button>
+    </section>
+
+    <!--==================== PRODUCTS ====================-->
+    <section class="products section container" id="products">
+        <h2 class="section__title">
+            Products
+        </h2>
+        <div class="products__container grid">
+            {% for product in products %}
+                <article class="products__card">
+                    <img src="{% static product.image %}" alt="" class="products__img">
+
+                    <h3 class="products__title">{{ product.name }}</h3>
+                    <span class="products__price">${{ product.price }}</span>
+
+                    <button class="products__button">
+                        <i class='bx bx-shopping-bag'></i>
+                    </button>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+<!--==================== NEW ====================-->
+<section class="new section container" id="new">
+    <h2 class="section__title">
+        New Arrivals
+    </h2>
+    
+    <div class="new__container">
+        <div class="swiper new-swiper">
+            <div class="swiper-wrapper">
+                <article class="new__card swiper-slide">
+                    <span class="new__tag">New</span>
+
+                    <img src="{% static 'img/new1.png' %}" alt="" class="new__img">
+
+                    <div class="new__data">
+                        <h3 class="new__title">Longines rose</h3>
+                        <span class="new__price">$980</span>
+                    </div>
+
+                    <button class="button new__button">ADD TO CART</button>
+                </article>
+
+                <article class="new__card swiper-slide">
+                    <span class="new__tag">New</span>
+
+                    <img src="{% static 'img/new2.png' %}" alt="" class="new__img">
+
+                    <div class="new__data">
+                        <h3 class="new__title">Jazzmaster</h3>
+                        <span class="new__price">$1150</span>
+                    </div>
+
+                    <button class="button new__button">ADD TO CART</button>
+                </article>
+
+                <article class="new__card swiper-slide">
+                    <span class="new__tag">New</span>
+
+                    <img src="{% static 'img/new3.png' %}" alt="" class="new__img">
+
+                    <div class="new__data">
+                        <h3 class="new__title">Dreyfuss gold</h3>
+                        <span class="new__price">$750</span>
+                    </div>
+
+                    <button class="button new__button">ADD TO CART</button>
+                </article>
+
+                <article class="new__card swiper-slide">
+                    <span class="new__tag">New</span>
+
+                    <img src="{% static 'img/new4.png' %}" alt="" class="new__img">
+
+                    <div class="new__data">
+                        <h3 class="new__title">Portuguese rose</h3>
+                        <span class="new__price">$1590</span>
+                    </div>
+
+                    <button class="button new__button">ADD TO CART</button>
+                </article>                       
+            </div>
+        </div>
+    </div>
+</section>
+
+<!--==================== NEWSLETTER ====================-->
+<section class="newsletter section container">
+    <div class="newsletter__bg grid">
+        <div>
+            <h2 class="newsletter__title">Subscribe Our <br> Newsletter</h2>
+            <p class="newsletter__description">
+                Don't miss out on your discounts. Subscribe to our email 
+                newsletter to get the best offers, discounts, coupons, 
+                gifts and much more.
+            </p>
+        </div>
+
+        <form action="" class="newsletter__subscribe">
+            <input type="email" placeholder="Enter your email" class="newsletter__input">
+            <button class="button">
+                SUBSCRIBE
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}

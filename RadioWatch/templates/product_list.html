@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cart - Rolex Store{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1 class="hero-title">Shop</h1>
+    <p class="hero-description">Explore our exclusive range of products</p>
+</section>
+
+<!-- Filter Section -->
+<div class="main-content">
+    <!-- Filter Sidebar -->
+    <aside class="filters">
+        <h2>Filter By</h2>
+        <form method="GET" action="{% url 'product_list' %}">
+            <div class="filter-category">
+                <h3>Categories</h3>
+                <ul>
+                    {% for category in categories %}
+                        <li>
+                            <input type="checkbox" id="category{{ category.id }}" name="category" value="{{ category.id }}">
+                            <label for="category{{ category.id }}">{{ category.name }}</label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="filter-price">
+                <h3>Price Range</h3>
+                <input type="range" min="0" max="1000" value="500" id="priceRange" name="price">
+                <label for="priceRange">Price: $0 - $1000</label>
+            </div>
+            <div class="filter-sort">
+                <h3>Sort By</h3>
+                <select id="sortOptions" name="sort">
+                    <option value="popularity">Popularity</option>
+                    <option value="priceLowToHigh">Price: Low to High</option>
+                    <option value="priceHighToLow">Price: High to Low</option>
+                </select>
+            </div>
+            <button type="submit">Apply Filters</button>
+        </form>
+    </aside>
+
+    <!-- Product Grid Section -->
+    <main class="product-grid">
+        {% for product in products %}
+            <div class="product-card">
+                <img src="{% static product.image.url %}" alt="{{ product.name }}"> <!-- Assuming image field exists -->
+                <h3>{{ product.name }}</h3>
+                <p class="price">${{ product.price }}</p>
+                <p class="rating">⭐⭐⭐⭐⭐</p>
+                <a href="{% url 'product_detail' product.id %}" class="view-details">View Details</a>
+                <button class="add-to-cart">Add to Cart</button>
+                <button class="add-to-wishlist">Add to Wishlist</button>
+            </div>
+        {% endfor %}
+    </main>
+</div>
+
+<!-- Pagination Section -->
+<div class="pagination">
+    {% if products.has_previous %}
+        <button class="prev-page"><a href="?page={{ products.previous_page_number }}">Previous</a></button>
+    {% endif %}
+    <span class="page-numbers">
+        {% for page_num in products.paginator.page_range %}
+            <a href="?page={{ page_num }}">{{ page_num }}</a>
+        {% endfor %}
+    </span>
+    {% if products.has_next %}
+        <button class="next-page"><a href="?page={{ products.next_page_number }}">Next</a></button>
+    {% endif %}
+</div>
+
+<script src="{% static 'js/script.js' %}"></script> <!-- Link to JS file -->
+{% endblock %}

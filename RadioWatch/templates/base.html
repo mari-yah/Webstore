@@ -1,0 +1,109 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{% static 'img/favicon.png' %}" type="image/x-icon">
+
+    <!-- Boxicons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <!-- jS for whishlist and add to cart buttons for products -->
+    <script src="{% static 'js/script.js' %}" defer></script>
+
+    <!-- Font Awesome for Icons-->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    
+    <title>{% block title %}My Watches Store{% endblock %}</title>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full bg-white shadow-md z-10" id="header"></header>
+        <nav class="nav container">
+            <a href="{% url 'home' %}" class="nav__logo">
+                <i class='bx bxs-watch nav__logo-icon'></i> Radio Watch
+            </a>
+
+            <div class="nav__menu" id="nav-menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="{% url 'home' %}" class="nav__link active-link">Home</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#aboutus" class="nav__link">About Us</a>
+                    </li>
+                    <li class="nav__item">
+                        <a href="#products" class="nav__link">Products</a>
+                    </li>
+                </ul>
+                <div class="nav__close" id="nav-close">
+                    <i class='bx bx-x'></i>
+                </div>
+            </div>
+
+            <div class="nav__btns">
+                <!-- Theme Icon -->
+                <i class='bx bx-moon change-theme' id="theme-button"></i>
+
+                <!-- Search Bar -->
+                <div class="nav__search-container">
+                    <input type="text" class="nav__search-input" placeholder="Search...">
+                    <button class="nav__search-btn">
+                        <i class='bx bx-search'></i>
+                    </button>
+                </div>
+
+                <!-- User Icon -->
+                <a href="{% url 'login' %}" class="nav__link">
+                    <div class="nav__login" id="login-button">
+                        <i class='bx bx-user'></i> 
+                    </div>
+                </a>
+
+                <!-- Wishlist Icon -->
+                <a href="{% url 'wishlist' %}" class="nav__link">
+                    <div class="nav__wishlist" id="wishlist-button">
+                        <i class='bx bx-heart'></i>
+                    </div>
+                </a>
+
+                <!-- Cart Icon -->
+                <a href="{% url 'cart' %}" class="nav__shop">
+                    <div class="nav__shop" id="cart-shop">
+                        <i class='bx bx-shopping-bag'></i>
+                    </div>
+                </a>
+
+                <!-- Toggle Menu Icon -->
+                <div class="nav__toggle" id="nav-toggle">
+                    <i class='bx bx-grid-alt'></i>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer section">
+        <!-- Footer content here -->
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
