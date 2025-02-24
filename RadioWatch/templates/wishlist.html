@@ -1,61 +1,15 @@
 {% extends 'base.html' %}
 {% load static %}
+<link rel="stylesheet" href="{% static 'css/wishlist_styles.css' %}?v=2">
 
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-    <title>Wishlist - My Watches Store</title>
-</head>
-<body>
     <main class="wishlist-page">
         <div class="wishlist-container">
             <h3 class="wishlist-title">Your Wishlist</h3>
-
-            {% if wishlist_items %}
-            <div class="wishlist-items">
-                {% for item in wishlist_items %}
-                <div class="wishlist-item">
-                    <div class="wishlist-item-image">
-                        <img src="{{ item.image.url }}" alt="{{ item.name }}" class="wishlist-item-img">
-                    </div>
-                    <div class="wishlist-item-details">
-                        <h4 class="wishlist-item-name">{{ item.name }}</h4>
-                        <p class="wishlist-item-price">$ {{ item.price }}</p>
-                        <div class="wishlist-item-actions">
-                            <button class="add-to-cart-btn" onclick="addToCart('{{ item.id }}')">Add to Cart</button>
-                            <button class="remove-wishlist-btn" onclick="removeFromWishlist('{{ item.id }}')">Remove</button>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="wishlist-empty">Your wishlist is empty. <a href="/">Browse products</a> to add items!</p>
-            {% endif %}
+            <div class="wishlist-items"></div>
+            <p class="wishlist-empty" style="display: none;">Your wishlist is empty. <a href="/">Browse products</a> to add items!</p>
         </div>
     </main>
 
-    <script>
-        function addToCart(itemId) {
-            fetch(`/add-to-cart/${itemId}/`, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => alert(data.message));
-        }
-
-        function removeFromWishlist(itemId) {
-            fetch(`/remove-from-wishlist/${itemId}/`, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    location.reload();
-                });
-        }
-    </script>
-</body>
-</html>
+    <script src="{% static 'js/main.js' %}"></script>
 {% endblock %}
