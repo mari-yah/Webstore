@@ -20,7 +20,7 @@ urlpatterns = [
     path('products/', views.product_list, name='product_list'),
     path('product/<str:product_id>/', views.product_detail, name='product_detail'),  # ✅ Changed from <int> to <str>
     path('brand/<str:brand_name>/', views.product_by_brand, name='product_by_brand'),
-    
+    path('type/<str:type>/', views.product_by_type, name='product_by_type'),
     path('bargain/<int:customer_id>/<int:product_id>/', bargain_product, name='bargain_product'),
 ]
 

@@ -108,6 +108,11 @@ def product_by_brand(request, brand_name):
     products = Product.objects.filter(brand_name=brand_name)
     return render(request, 'product_brand.html', {'products': products, 'brand_name': brand_name})
 
+# View for Products by type (Updated)
+def product_by_type(request, type):
+    products = Product.objects.filter(type=type)
+    return render(request, 'product_type.html', {'products': products, 'type': type})
+
 # Product List View
 def product_list(request):
     products = Product.objects.all()

@@ -1542,7 +1542,7 @@ footer {
   padding: 15px;
   text-align: center;
   transition: transform 0.2s;
-  width: calc(25% - 20px); /* Adjust width as needed */
+  width: calc(30% - 20px); /* Adjust width as needed */
 }
 
 .product-item:hover {
@@ -1561,13 +1561,13 @@ footer {
 }
 
 .product-name {
-  font-size: 1.5em;
+  font-size: 1em;
   margin: 10px 0;
   color: var(--title-color); /* Use your defined color variable */
 }
 
 .product-price {
-  font-size: 1.2em;
+  font-size: 1em;
   color: hsl(0, 0%, 35%); /* Adjust color as needed */
 }
 
@@ -1581,36 +1581,36 @@ footer {
 /* css for add to cart and whislist buttons for products*/
 .product-actions {
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
+  gap: 5px;
+  margin: 15px 15px 15px 15px;
   justify-content: center;
 }
 
 .action-button {
-  padding: 10px 20px;
+  padding: 8px 16px 8px 16px; /* Reduced padding for a more compact look */
   border: none;
-  border-radius: 30px;
+  border-radius: 25px;
   background: linear-gradient(135deg, #ff7eb3, #ff758c);
   color: white;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  gap: 6px; /* Reduced gap between icon and text */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
+  white-space: nowrap; /* Ensures text stays in one line */
 }
 
 .action-button i {
-  font-size: 16px;
+  font-size: 14px; /* Slightly smaller icon */
   transition: transform 0.3s ease;
 }
 
 .action-button:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   transform: translateY(-2px);
 }
 
@@ -1624,11 +1624,25 @@ footer {
 
 .action-button span {
   transition: color 0.3s ease;
+  font-size: 13px; /* Slightly reduced font size for better fit */
 }
 
 .action-button:hover i {
-  transform: scale(1.2);
+  transform: scale(1.1);
 }
+
+@media (max-width: 600px) {
+  .product-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* ✅ Pop-up Notification Styles */
 
 .cart-popup {
