@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+/*document.addEventListener("DOMContentLoaded", function () {
     updateCartCount();
 
     document.querySelectorAll(".add-to-cart").forEach(button => {
@@ -188,4 +188,4 @@ function removeFromWishlist(productId) {
     localStorage.setItem("wishlist", JSON.stringify(wishlist));
 
     loadWishlist(); // Refresh wishlist UI
-}
+}*/
