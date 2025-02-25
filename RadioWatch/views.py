@@ -79,8 +79,35 @@ def login_view(request):
     return render(request, 'loginpage.html', {'is_signup': False})
 
 def cart_view(request):
-    # logic for cart view
-    return render(request, 'cart.html')  # Adjust the template name as needed
+    cart = request.session.get('cart', {})
+    cart_items = []
+    total_price = 0
+
+    for product_id, details in cart.items():
+        product = get_object_or_404(Product, product_id=product_id)
+        quantity = details['quantity']
+        subtotal = product.price * quantity
+        total_price += subtotal
+
+        cart_items.append({
+            'product': product,
+            'quantity': quantity,
+            'subtotal': subtotal
+        })
+
+    # Example discount logic (Modify as needed)
+    discount = 0
+    if total_price > 5000:
+        discount = total_price * 0.1  # 10% discount for orders above ₹5000
+
+    final_price = total_price - discount
+
+    return render(request, 'cart.html', {
+        'cart_items': cart_items,
+        'total_price': total_price,
+        'discount': round(discount, 2),
+        'final_price': round(final_price, 2)
+    })
 
 def wishlist_view(request):
     return render(request, 'wishlist.html')
