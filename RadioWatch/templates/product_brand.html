@@ -5,12 +5,7 @@
         <h1 class="brand-title">{{ brand_name }}</h1>
         <div class="product-list">
             {% for product in products %}
-                <div class="product-item" 
-                    data-id="{{ product.product_id }}" 
-                    data-name="{{ product.product_name }}" 
-                    data-price="{{ product.price }}" 
-                    data-image="{{ product.image.url }}">
-                    
+                <div class="product-item">
                     <a href="{% url 'product_detail' product.product_id %}" class="product-link">
                         <img src="{{ product.image.url }}" alt="{{ product.product_name }}" class="product-image">
                         <h2 class="product-name">{{ product.product_name }}</h2>
@@ -18,16 +13,52 @@
                     </a>
                     
                     <div class="product-actions">
-                        <button class="action-button add-to-cart">
-                            <i class="fas fa-shopping-cart"></i> <span>Add to Cart</span>
-                        </button>
-                        <button class="action-button wishlist">
+                        <!-- Add to Cart Form -->
+                        <form id="addToCartForm_{{ product.product_id }}" action="{% url 'add_to_cart' product.product_id %}" method="post">
+                            {% csrf_token %}
+                            <button type="button" class="action-button add-to-cart" onclick="confirmAddToCart('{{ product.product_id }}')">
+                                <i class="fas fa-shopping-cart"></i> <span>Add to Cart</span>
+                            </button>
+                        </form>
+
+                        <!-- Wishlist Button -->
+                        <button type="button" class="action-button wishlist">
                             <i class="fas fa-heart"></i> <span>Add to Wishlist</span>
                         </button>
                     </div>
                 </div>
-        
             {% endfor %}
         </div>
     </div>
+
+    <div id="cart-popup" class="cart-popup">
+        <p>Item added to cart!</p>
+    </div>
+
+    <script>
+        function confirmAddToCart(productId) {
+            console.log("Add to Cart button clicked for product ID:", productId); // ✅ Debugging Log
+
+            let popup = document.getElementById("cart-popup");
+            
+            if (!popup) {
+                console.error("Pop-up element not found!"); // ✅ Debugging Error
+                return;
+            }
+
+            popup.style.display = "block"; // ✅ Show pop-up
+            popup.style.opacity = "1";     // ✅ Ensure visibility
+
+            
+            setTimeout(function () {
+                popup.style.opacity = "0";  // ✅ Fade out effect
+                setTimeout(() => { popup.style.display = "none"; }, 500); // Hide completely
+            }, 5000);
+
+            // ✅ Submit form after showing pop-up
+            setTimeout(function () {
+                document.getElementById("addToCartForm_" + productId).submit();
+            }, 500);
+        }
+    </script>
 {% endblock %}

@@ -1,0 +1,150 @@
+/* General Styles */
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+/* Cart Container */
+.cart-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+/* Cart Header */
+.cart-container h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Cart Table */
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.cart-table th, .cart-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-table th {
+    background-color: #343a40;
+    color: #fff;
+}
+
+/* Product Image */
+.cart-table img {
+    width: 60px;
+    height: auto;
+    border-radius: 5px;
+}
+
+/* Quantity Input */
+.quantity {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+/* Buttons */
+.button {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.remove-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.remove-btn:hover {
+    background-color: #c82333;
+}
+
+.clear-btn {
+    background-color: #ff5722;
+    color: white;
+}
+
+.clear-btn:hover {
+    background-color: #e64a19;
+}
+
+.checkout-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.checkout-btn:hover {
+    background-color: #218838;
+}
+
+/* ✅ Centering Checkout & Clear Cart Buttons */
+.cart-buttons {
+    display: flex;
+    justify-content: center;  /* ✅ Centers buttons horizontally */
+    align-items: center;
+    gap: 15px;  /* ✅ Adds space between buttons */
+    margin-top: 20px;
+}
+
+/* ✅ Bargain Button Styling */
+.bargain-container {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.bargain-btn {
+    background: #ff9800;  /* Orange color */
+    color: white;
+    font-weight: bold;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.bargain-btn:hover {
+    background: #e68900;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .cart-table th, .cart-table td {
+        font-size: 14px;
+        padding: 8px;
+    }
+    
+    .cart-table img {
+        width: 50px;
+    }
+    
+    .quantity {
+        width: 40px;
+    }
+
+    /* ✅ Stack buttons on small screens */
+    .cart-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

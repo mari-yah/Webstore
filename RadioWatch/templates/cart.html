@@ -1,18 +1,69 @@
-{% extends 'base.html' %}
-{% block title %}Cart - Rolex Store{% endblock %}
+{% load static %}
 
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="{% static 'css/cart-styles.css' %}">
+    <script>
+        function confirmAddToCart() {
+            alert("Item added to cart!");  // ✅ Pop-up confirmation
+            return true;  // ✅ Allows form submission after clicking OK
+        }
+    </script>
+</head>
+<body>
+
 <div class="cart-container">
-    <h1>Your Shopping Cart</h1>
-    
-    <div id="cart-items" class="cart-items">
-        <!-- Cart items will be dynamically inserted here -->
-    </div>
-    
-    <div class="cart-summary">
-        <h3>Total: <span id="cart-total">₹0.00</span></h3>
-        <button onclick="clearCart()" class="clear-cart">Clear Cart</button>
-        <button onclick="proceedToCheckout()" class="checkout-button">Proceed to Checkout</button>
-    </div>
+    <h2>Your Shopping Cart</h2>
+
+    {% if cart_items %}
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td><img src="{{ item.image }}" alt="{{ item.name }}"></td>
+                    <td>{{ item.name }}</td>
+                    <td><input type="number" class="quantity" value="{{ item.quantity }}" min="1"></td>
+                    <td>₹{{ item.price }}</td>
+                    <td>
+                        <form action="{% url 'remove_from_cart' item.product_id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="button remove-btn">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p class="total-price"><strong>Total:</strong> ₹{{ total_price }}</p>
+        <!-- ✅ New "Bargain Now" Button (No connectivity, just display) -->
+        <div class="bargain-container">
+            <button class="button bargain-btn">Bargain Now</button>
+        </div>
+
+    {% else %}
+        <p class="empty-cart">Your cart is empty.</p>
+    {% endif %}
 </div>
-{% endblock %}
+
+</body>
+</html>
+        <div class="cart-buttons">
+            <a href="{% url 'clear_cart' %}" class="button clear-btn">Clear Cart</a>
+            <a href="#" class="button checkout-btn">Proceed to Checkout</a>  <!-- Replace '#' with actual checkout URL -->
+        </div>
+
+
