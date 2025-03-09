@@ -10,23 +10,21 @@ from decimal import Decimal
 # Home Page
 @login_required
 def home_view(request):
-    template = loader.get_template('home.html')  
-    context = {}  
-    return HttpResponse(template.render(context, request))
+    return render(request, 'home.html')
 
 # Signup View
 def signup_view(request):
     from .forms import UserSignupForm
     if request.method == 'POST':
-        form = UserSignupForm(request.POST)  
+        form = UserSignupForm(request.POST)
         if form.is_valid():
-            user = form.save()  
+            user = form.save()
             user = authenticate(request, username=user.username, password=form.cleaned_data['password1'])
-            if user is not None:
-                login(request, user)  
-                return redirect('home')  
+            if user:
+                login(request, user)
+                return redirect('home')
             else:
-                return render(request, 'loginpage.html', {'form': form, 'error': 'Authentication failed.'})
+                messages.error(request, "Authentication failed.")
     else:
         form = UserSignupForm()
 
@@ -38,14 +36,14 @@ def login_view(request):
         username = request.POST.get('username_or_email')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
-        if user is not None:
-            login(request, user)  
-            return redirect('home')  
+        if user:
+            login(request, user)
+            return redirect('home')
         else:
-            return render(request, 'loginpage.html', {'error': 'Invalid credentials'})
+            messages.error(request, "Invalid credentials")
     return render(request, 'loginpage.html', {'is_signup': False})
 
-# Cart View (Updated)
+# Cart View
 def cart(request):
     cart = request.session.get('cart', {})
     cart_items = []
@@ -54,7 +52,7 @@ def cart(request):
     for product_id, quantity in cart.items():
         if not product_id:
             continue
-        product = get_object_or_404(Product, product_id=product_id)  # Fixed id issue
+        product = get_object_or_404(Product, product_id=product_id)
         cart_items.append({
             'product_id': product.product_id,
             'name': product.product_name,
@@ -66,10 +64,7 @@ def cart(request):
 
     return render(request, 'cart.html', {'cart_items': cart_items, 'total_price': total_price})
 
-# Add to Cart View (Updated)
-from django.shortcuts import redirect
-from django.contrib import messages
-
+# Add to Cart
 def add_to_cart(request, product_id):
     if request.method == "POST":
         cart = request.session.get('cart', {})
@@ -78,54 +73,80 @@ def add_to_cart(request, product_id):
         messages.success(request, "Item added to cart!")
     return redirect(request.META.get('HTTP_REFERER', 'home'))
 
-# Remove from Cart View (Updated)
+# Remove from Cart
 def remove_from_cart(request, product_id):
     cart = request.session.get('cart', {})
-    if product_id and product_id in cart:
+    if product_id in cart:
         del cart[product_id]
         request.session['cart'] = cart
         messages.success(request, "Removed from cart!")
-    else:
-        messages.error(request, "Invalid product.")
     return redirect('cart')
 
-# Clear Cart View
+# Clear Cart
 def clear_cart(request):
     request.session['cart'] = {}
     return redirect('cart')
 
-# Wishlist View (Updated)
+# Wishlist View
 def wishlist_view(request):
     return render(request, 'wishlist.html')
 
-# Product Detail View (Updated)
+# Add to Wishlist
+def add_to_wishlist(request, product_id):
+    messages.success(request, "Item added to wishlist!")
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+# Product Detail View
 def product_detail(request, product_id):
-    product = get_object_or_404(Product, product_id=product_id)  # Fixed id issue
+    product = get_object_or_404(Product, product_id=product_id)
     return render(request, 'product_detail.html', {'product': product})
 
-# View for Products by Brand (Updated)
+# Products by Brand
 def product_by_brand(request, brand_name):
     products = Product.objects.filter(brand_name=brand_name)
     return render(request, 'product_brand.html', {'products': products, 'brand_name': brand_name})
 
-# View for Products by type (Updated)
+# Products by Type
 def product_by_type(request, type):
     products = Product.objects.filter(type=type)
     return render(request, 'product_type.html', {'products': products, 'type': type})
 
-# Product List View
+# Product List
 def product_list(request):
-    products = Product.objects.all()
-    return render(request, "product_list.html", {"products": products})
+    """Displays the list of products with optional filtering by category and brand."""
+    category = request.GET.get('category', 'All')
+    brand = request.GET.get('brand', 'All')
 
-# Bargain Product View (Updated)
+    # Start with all products
+    products = Product.objects.all()
+
+    # Apply category filter if not 'All'
+    if category != 'All':
+        products = products.filter(category=category)
+        print(f"Filtered by category: {category}, Products found: {products.count()}")
+
+    # Apply brand filter if not 'All'
+    if brand != 'All':
+        products = products.filter(brand_name=brand)
+        print(f"Filtered by brand: {brand}, Products found: {products.count()}")
+
+    context = {
+        'products': products,
+        'selected_category': category,
+        'selected_brand': brand,
+    }
+    
+    return render(request, 'product_list.html', context)
+
+
+# Bargain Product
 def bargain_product(request, customer_id, product_id):
     customer = get_object_or_404(Customer, id=customer_id)
-    product = get_object_or_404(Product, product_id=product_id)  # Fixed id issue
+    product = get_object_or_404(Product, product_id=product_id)
 
     bargain, created = Bargain.objects.get_or_create(customer=customer, product=product)
     actual_price = product.price
-    discount = 0  
+    discount = 0
 
     if customer.total_purchases > 5:
         discount = max(discount, 10)
@@ -134,9 +155,10 @@ def bargain_product(request, customer_id, product_id):
     if customer.total_purchases == 0:
         discount = max(discount, 5)
 
-    final_price = round(Decimal(actual_price) * Decimal(1 - (discount) / 100), 2)
+    final_price = round(Decimal(actual_price) * Decimal(1 - discount / 100), 2)
     
     bargain.final_price = final_price
     bargain.save()
 
     return render(request, 'bargain.html', {'bargain': bargain, 'discount': discount})
+

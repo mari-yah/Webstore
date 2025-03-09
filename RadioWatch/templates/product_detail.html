@@ -4,31 +4,72 @@
 {% block title %}{{ product.product_name }} - Rolex Store{% endblock %}
 
 {% block content %}
-<div class="container mx-auto p-6">
-    <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div class="grid grid-cols-1 md:grid-cols-2">
-            <div class="p-4">
-                <img src="{{ product.image.url }}" alt="{{ product.product_name }}" class="w-full h-auto object-cover rounded-lg shadow-md">
-            </div>
+<div class="product-detail-container">
+    
+    <!-- Image Section -->
+    <div class="product-image-container">
+        <img src="{{ product.image.url }}" alt="{{ product.product_name }}" class="product-image">
+    </div>
+    
+    <!-- Details Section -->
+    <div class="product-details-container">
+        <h1 class="product-name">{{ product.product_name }}</h1>
+        <p class="product-description"><strong>Description:</strong> {{ product.description }}</p>
+        <p class="product-price"><strong>Price:</strong> ₹{{ product.price }}</p>
 
-            <div class="p-6">
-                <h1 class="text-2xl font-bold text-gray-800 mb-4">{{ product.product_name }}</h1>
-                <p class="text-gray-600"><strong>Description:</strong> {{ product.description }}</p>
-                <p class="text-gray-700 text-lg font-semibold"><strong>Price:</strong> ₹{{ product.price }}</p>
-                
-                <div class="mt-6 flex space-x-4">
-                    <button class="add-to-cart"
-                            data-id="{{ product.id }}"
-                            data-name="{{ product.product_name }}"
-                            data-price="{{ product.price }}"
-                            data-image="{{ product.image.url }}">
-                        Add to Cart
-                    </button>
-                    <button class="add-to-wishlist">Wishlist</button>
-                </div>
-            </div>
+        <div class="action-buttons">
+            <!-- Add to Cart Form -->
+            <form id="addToCartForm" action="{% url 'add_to_cart' product.product_id %}" method="post">
+                {% csrf_token %}
+                <button type="button" class="action-button add-to-cart" 
+                        onclick="showPopupAndSubmit('Item added to cart!')">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+            </form>
+
+            <!-- Add to Wishlist Button -->
+            <button type="button" class="action-button add-to-wishlist" 
+                    onclick="showPopup('Added to wishlist!')">
+                <i class="fas fa-heart"></i> Add to Wishlist
+            </button>
         </div>
     </div>
 </div>
-<script src="{% static 'js/main.js' %}"></script>
+
+<!-- Popup Element -->
+<div id="popup" class="popup">
+    <p class="popup-message" id="popup-message"></p>
+    <button onclick="closePopup()">OK</button>
+</div>
+
+<!-- Link to CSS -->
+<link rel="stylesheet" href="{% static 'css/product_detail.css' %}">
+
+<!-- Script for Popup and Form Submission -->
+<script>
+    function showPopup(message) {
+        const popup = document.getElementById('popup');
+        const popupMessage = document.getElementById('popup-message');
+        
+        popupMessage.textContent = message;
+        popup.classList.add('active');
+
+        // Auto close the popup after 2 seconds
+        setTimeout(closePopup, 2000);
+    }
+
+    function showPopupAndSubmit(message) {
+        showPopup(message);
+
+        // Delay form submission to show the popup first
+        setTimeout(function() {
+            document.getElementById('addToCartForm').submit();
+        }, 2000); // Wait 2 seconds before submitting
+    }
+
+    function closePopup() {
+        const popup = document.getElementById('popup');
+        popup.classList.remove('active');
+    }
+</script>
 {% endblock %}
