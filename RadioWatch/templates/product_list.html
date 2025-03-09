@@ -16,61 +16,83 @@
     <aside class="sidebar">
         <div class="filter-header">
             <h2>Filter by 
-            <button id="apply-filters"><i class="fas fa-filter"></i></button></h2>
+                <button id="apply-filters"><i class="fas fa-filter"></i></button>
+            </h2>
         </div>
 
         <h3>Categories</h3>
         <ul>
-            <li><input type="checkbox" class="filter-category" value="Men"> Men’s Watches</li>
-            <li><input type="checkbox" class="filter-category" value="Women"> Women’s Watches</li>
+            <li>
+                <input type="checkbox" class="filter-category" value="Male" 
+                       onclick="filterByCategory('Male')"> 
+                Men’s Watches
+            </li>
+            <li>
+                <input type="checkbox" class="filter-category" value="Female" 
+                       onclick="filterByCategory('Female')"> 
+                Women’s Watches
+            </li>
+            <li>
+                <input type="checkbox" class="filter-category" value="All" 
+                       onclick="filterByCategory('All')" checked> 
+                All Watches
+            </li>
         </ul>
 
         <h3>Brands</h3>
         <ul>
-            <li><input type="checkbox" class="filter-brand" value="Cartier"> Cartier</li>
-            <li><input type="checkbox" class="filter-brand" value="Casio"> Casio</li>
-            <li><input type="checkbox" class="filter-brand" value="Omega"> Omega</li>
-            <li><input type="checkbox" class="filter-brand" value="Rolex"> Rolex</li>
-            <li><input type="checkbox" class="filter-brand" value="Fossil"> Fossil</li>
+            <li>
+                <input type="checkbox" class="filter-brand" value="Cartier" 
+                       onclick="filterByBrand('Cartier')"> 
+                Cartier
+            </li>
+            <li>
+                <input type="checkbox" class="filter-brand" value="Casio" 
+                       onclick="filterByBrand('Casio')"> 
+                Casio
+            </li>
+            <li>
+                <input type="checkbox" class="filter-brand" value="Omega" 
+                       onclick="filterByBrand('Omega')"> 
+                Omega
+            </li>
+            <li>
+                <input type="checkbox" class="filter-brand" value="Rolex" 
+                       onclick="filterByBrand('Rolex')"> 
+                Rolex
+            </li>
+            <li>
+                <input type="checkbox" class="filter-brand" value="Fossil" 
+                       onclick="filterByBrand('Fossil')"> 
+                Fossil
+            </li>
+            <li>
+                <input type="checkbox" class="filter-brand" value="All" 
+                       onclick="filterByBrand('All')" checked> 
+                All Brands
+            </li>
         </ul>
-
-        <h3>Type</h3>
-        <ul>
-            <li><input type="checkbox" class="filter-type" value="Smart"> Smart</li>
-            <li><input type="checkbox" class="filter-type" value="Solar"> Solar</li>
-            <li><input type="checkbox" class="filter-type" value="Analog"> Analog</li>
-            <li><input type="checkbox" class="filter-type" value="Digital"> Digital</li>
-            <li><input type="checkbox" class="filter-type" value="Quartz"> Quartz</li>
-        </ul>
-
-        <h3>Price Range</h3>
-        <input type="number" id="min-price" placeholder="Min Price" min="5000" max="500000">
-        <input type="number" id="max-price" placeholder="Max Price" min="5000" max="500000">
-
-        <h3>Ratings</h3>
-        <ul>
-            <li><input type="radio" name="rating" class="filter-rating" value="1"> 1 Star & Above</li>
-            <li><input type="radio" name="rating" class="filter-rating" value="2"> 2 Stars & Above</li>
-            <li><input type="radio" name="rating" class="filter-rating" value="3"> 3 Stars & Above</li>
-            <li><input type="radio" name="rating" class="filter-rating" value="4"> 4 Stars & Above</li>
-            <li><input type="radio" name="rating" class="filter-rating" value="5"> 5 Stars</li>
-        </ul>
+        
     </aside>
 
     <!-- Product Grid -->
     <main class="product-grid" id="product-grid">
         {% for product in products %}
-        <div class="product-card" data-category="{{ product.category }}" data-brand="{{ product.brand }}"
-            data-type="{{ product.type }}" data-price="{{ product.price }}" data-rating="{{ product.rating }}">
+        <div class="product-card" data-category="{{ product.category }}" 
+             data-brand="{{ product.brand }}" data-type="{{ product.type }}" 
+             data-price="{{ product.price }}" data-rating="{{ product.rating }}">
             <img src="{{ product.image.url }}" alt="{{ product.product_name }}">
             <h3>{{ product.product_name }}</h3>
             <p class="price">₹{{ product.price }}</p>
             <p class="rating">⭐ {{ product.rating }}</p>
+            
             <div class="product-actions">
                 <!-- Add to Cart Form -->
-                <form id="addToCartForm_{{ product.product_id }}" action="{% url 'add_to_cart' product.product_id %}" method="post">
+                <form id="addToCartForm_{{ product.product_id }}" 
+                      action="{% url 'add_to_cart' product.product_id %}" method="post">
                     {% csrf_token %}
-                    <button type="button" class="action-button add-to-cart" onclick="confirmAddToCart('{{ product.product_id }}')">
+                    <button type="button" class="action-button add-to-cart" 
+                            onclick="confirmAddToCart('{{ product.product_id }}')">
                         <i class="fas fa-shopping-cart"></i> <span>Add to Cart</span>
                     </button>
                 </form>
@@ -81,43 +103,68 @@
                 </button>
             </div>
         </div>
+        {% empty %}
+        <p>No products available at the moment.</p>
         {% endfor %}
     </main>
 </div>
 
+<!-- Cart Popup -->
 <div id="cart-popup" class="cart-popup">
     <p>Item added to cart!</p>
 </div>
 
+<!-- JavaScript for Filtering and Add to Cart -->
 <script>
-    function confirmAddToCart(productId) {
-        console.log("Add to Cart button clicked for product ID:", productId); // ✅ Debugging Log
+function filterByCategory(category) {
+    const selectedBrand = document.querySelector('input.filter-brand:checked')?.value || 'All';
+    applyFilters(category, selectedBrand);
+}
 
-        let popup = document.getElementById("cart-popup");
-        
-        if (!popup) {
-            console.error("Pop-up element not found!"); // ✅ Debugging Error
-            return;
+// Function to filter products by brand
+function filterByBrand(brand) {
+    const selectedCategory = document.querySelector('input.filter-category:checked')?.value || 'All';
+    applyFilters(selectedCategory, brand);
+}
+
+// Common function to apply both category and brand filters
+function applyFilters(category, brand) {
+    const productCards = document.querySelectorAll('.product-card');
+    productCards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category');
+        const cardBrand = card.getAttribute('data-brand');
+
+        const matchCategory = (category === 'All' || cardCategory === category);
+        const matchBrand = (brand === 'All' || cardBrand === brand);
+
+        if (matchCategory && matchBrand) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
         }
+    });
+}
 
-        popup.style.display = "block"; // ✅ Show pop-up
-        popup.style.opacity = "1";     // ✅ Ensure visibility
+    function confirmAddToCart(productId) {
+        let popup = document.getElementById("cart-popup");
+        if (!popup) return;
 
-        
+        popup.style.display = "block";
+        popup.style.opacity = "1";
+
         setTimeout(function () {
-            popup.style.opacity = "0";  // ✅ Fade out effect
-            setTimeout(() => { popup.style.display = "none"; }, 500); // Hide completely
-        }, 5000);
+            popup.style.opacity = "0";
+            setTimeout(() => { popup.style.display = "none"; }, 500);
+        }, 2000);
 
-        // ✅ Submit form after showing pop-up
         setTimeout(function () {
             document.getElementById("addToCartForm_" + productId).submit();
         }, 500);
     }
 </script>
-{% block extra_styles %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/product.css' %}">
-{% endblock %}
 
+<!-- Styles and Additional Scripts -->
+<link rel="stylesheet" href="{% static 'css/product.css' %}">
 <script src="{% static 'js/filter.js' %}"></script>
+
 {% endblock %}
