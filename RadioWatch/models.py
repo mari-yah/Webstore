@@ -54,13 +54,12 @@ class Cart(models.Model):
 
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="customer_profile") 
     total_purchases = models.PositiveIntegerField(default=0)
-    total_spent = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00")) 
-
+    total_spent = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))  
 
     def __str__(self):
-        return f"Customer {self.customer_id} (User {self.user.user_id})"
+        return f"Customer {self.customer_id} (User {self.user.pk})"
 
 class PurchaseHistory(models.Model):
     purchase_id = models.AutoField(primary_key=True)

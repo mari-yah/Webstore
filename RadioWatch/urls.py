@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import update_cart_quantity
 
 urlpatterns = [
     path('', views.home_view, name='home'),
@@ -26,7 +27,8 @@ urlpatterns = [
     path('type/<str:type>/', views.product_by_type, name='product_by_type'),
 
     # Bargain URLs
-    path('bargain/<int:customer_id>/<int:product_id>/', views.bargain_product, name='bargain_product'),
+    path('home/bargain/<int:customer_id>/<str:product_id>/', views.bargain_product, name='bargain_product'),
+    path('update-cart-quantity/', update_cart_quantity, name='update_cart_quantity'),
 
     
 ]

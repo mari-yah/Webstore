@@ -6,14 +6,10 @@
     <title>Bargain Price</title>
 </head>
 <body>
-    <h2>Bargain for {{ bargain.product.product_name }}</h2>
-    <p>Original Price: ₹{{ bargain.product.price }}</p>
-    <p>Discount Applied: {{ discount }}%</p>
-    <p>Final Bargained Price: ₹{{ bargain.final_price }}</p>
-
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit">Accept Price</button>
-    </form>
+    <h2>Bargain Summary</h2>
+<p>Original Price: ₹{{ actual_price }}</p>
+<p>Discount Applied: {{ discount }}%</p>
+<p>Final Price: ₹{{ final_price }}</p>
+<a href="{% url 'cart' %}" class="btn btn-primary">Back to Cart</a>
 </body>
 </html>
