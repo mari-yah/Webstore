@@ -155,7 +155,7 @@ def bargain_product(request, customer_id, product_id):
     
     customer = get_object_or_404(Customer, customer_id=customer_id)
     product = get_object_or_404(Product, product_id=product_id)  # Fix product lookup
-
+    print(product)
     # Retrieve or create bargain instance
     bargain, created = Bargain.objects.get_or_create(customer=customer, product=product)
 

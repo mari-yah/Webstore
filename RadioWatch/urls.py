@@ -27,7 +27,7 @@ urlpatterns = [
     path('type/<str:type>/', views.product_by_type, name='product_by_type'),
 
     # Bargain URLs
-    path('home/bargain/<int:customer_id>/<str:product_id>/', views.bargain_product, name='bargain_product'),
+    path('bargain_product/<int:customer_id>/<str:product_id>/', views.bargain_product, name='bargain_product'),
     path('update-cart-quantity/', update_cart_quantity, name='update_cart_quantity'),
 
     

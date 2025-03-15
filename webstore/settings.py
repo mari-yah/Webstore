@@ -132,3 +132,5 @@ LOGIN_URL = '/login/'  # This should match the path for your login page in urls.
 # Media settings
 MEDIA_URL = '/media/'  # URL to access media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Directory to store uploaded files
+
+APPEND_SLASH = True
