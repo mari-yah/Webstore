@@ -1,7 +1,7 @@
 from django.db import models
 from decimal import Decimal
 
-class User(models.Model):
+class UserRadioWatch(models.Model):
     ADMIN = 'admin'
     USER = 'user'
 
@@ -36,7 +36,7 @@ class Product(models.Model):
         return self.product_name
 
 class Wishlist(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserRadioWatch, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
 
@@ -44,7 +44,7 @@ class Wishlist(models.Model):
         return f"{self.user.user_id} - {self.product.product_id}"
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserRadioWatch, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     added_at = models.DateTimeField(auto_now_add=True)
@@ -54,7 +54,7 @@ class Cart(models.Model):
 
 class Customer(models.Model):
     customer_id = models.AutoField(primary_key=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="customer_profile") 
+    user = models.OneToOneField(UserRadioWatch, on_delete=models.CASCADE, related_name="customer_profile") 
     total_purchases = models.PositiveIntegerField(default=0)
     total_spent = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0.00"))  
 

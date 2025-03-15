@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import User, Product, Wishlist, Cart, Customer, PurchaseHistory, Bargain
+from .models import UserRadioWatch, Product, Wishlist, Cart, Customer, PurchaseHistory, Bargain
 
-admin.site.register(User)
+admin.site.register(UserRadioWatch)
 admin.site.register(Product)
 admin.site.register(Wishlist)
 admin.site.register(Cart)

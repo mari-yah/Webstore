@@ -1,49 +1,66 @@
+from django import forms
 from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+#from django.contrib.auth import authenticate, login
+#from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import User, Product, Bargain, Customer
+
+from RadioWatch.forms import UserRadioWatchForm
+from .models import UserRadioWatch, Product, Bargain, Customer
 from decimal import Decimal
+from django.contrib.auth.hashers import make_password, check_password
 
 
 # Home Page
-@login_required
+#@login_required
 def home_view(request):
     return render(request, 'home.html')
 
-# Signup View
+#signup view
 def signup_view(request):
-    from .forms import UserSignupForm
-    if request.method == 'POST':
-        form = UserSignupForm(request.POST)
+    if request.method == "POST":
+        form = UserRadioWatchForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            user = authenticate(request, username=user.username, password=form.cleaned_data['password1'])
-            if user:
-                login(request, user)
-                return redirect('home')
-            else:
-                messages.error(request, "Authentication failed.")
+            form.save()
+            return redirect("login")  # Redirect to login page after signup
     else:
-        form = UserSignupForm()
+        form = UserRadioWatchForm()
+    
+    return render(request, "loginpage.html", {"form": form, "is_signup": True})
 
-    return render(request, 'loginpage.html', {'form': form, 'is_signup': True})
+#login view
+class LoginForm(forms.Form):
+    username_or_email = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Username or Email'}))
+    password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
 
-# Login View
 def login_view(request):
-    if request.method == 'POST':
-        username = request.POST.get('username_or_email')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect('home')
-        else:
-            messages.error(request, "Invalid credentials")
-    return render(request, 'loginpage.html', {'is_signup': False})
+    error = None
+    form = LoginForm()  # Create an instance of the login form
 
+    if request.method == "POST":
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            username_or_email = form.cleaned_data["username_or_email"]
+            password = form.cleaned_data["password"]
+
+            try:
+                user = UserRadioWatch.objects.get(user_name=username_or_email) or UserRadioWatch.objects.get(email_id=username_or_email)
+                
+                if user.password == password:  # Check password (no hashing)
+                    request.session["user_id"] = user.user_id  # Create session
+                    return redirect("home")  # Redirect after login
+                else:
+                    error = "Invalid credentials"
+            except UserRadioWatch.DoesNotExist:
+                error = "User not found"
+
+    return render(request, "loginpage.html", {"login_form": form, "is_signup": False, "error": error})
+
+# Logout View
+def logout_view(request):
+    request.session.flush()  # Clear session data
+    return redirect('login')
 # Cart View
 def cart(request):
     cart = request.session.get('cart', {})
@@ -51,7 +68,8 @@ def cart(request):
     total_price = 0
 
     # Check if user has an associated Customer profile
-    customer = getattr(request.user, 'customer_profile', None)
+    user_id = request.session.get('user_id')
+    customer = Customer.objects.filter(user_id=user_id).first()
     
     # Ensure customer_id is fetched correctly
     customer_id = customer.customer_id if customer else None
@@ -80,7 +98,7 @@ def cart(request):
 def add_to_cart(request, product_id):
     if request.method == "POST":
         cart = request.session.get('cart', {})
-        cart[product_id] = cart.get(product_id, 0) + 1
+        cart[str(product_id)] = cart.get(str(product_id), 0) + 1
         request.session['cart'] = cart
         messages.success(request, "Item added to cart!")
     return redirect(request.META.get('HTTP_REFERER', 'home'))
@@ -105,6 +123,9 @@ def wishlist_view(request):
 
 # Add to Wishlist
 def add_to_wishlist(request, product_id):
+    wishlist = request.session.get('wishlist', set())
+    wishlist.add(str(product_id))
+    request.session['wishlist'] = list(wishlist)
     messages.success(request, "Item added to wishlist!")
     return redirect(request.META.get('HTTP_REFERER', 'home'))
 
@@ -133,12 +154,12 @@ def product_list(request):
     products = Product.objects.all()
 
     # Apply category filter if not 'All'
-    if category != 'All':
+    if category and category != 'All':
         products = products.filter(category=category)
         print(f"Filtered by category: {category}, Products found: {products.count()}")
 
     # Apply brand filter if not 'All'
-    if brand != 'All':
+    if brand and brand != 'All':
         products = products.filter(brand_name=brand)
         print(f"Filtered by brand: {brand}, Products found: {products.count()}")
 
@@ -168,7 +189,7 @@ def bargain_product(request, customer_id, product_id):
     elif customer.total_purchases > 5:
         discount = 10  # More than 5 purchases → 10%
     if customer.total_spent >= 200000:  # Fix: Threshold should be ₹2,00,000
-        discount = 20  # High-value customer gets 20%
+        discount = min(discount, 20)  # High-value customer gets 20%
 
     # Calculate final price after discount
     final_price = round(Decimal(actual_price) * Decimal(1 - discount / 100), 2)
@@ -200,17 +221,17 @@ def update_cart_quantity(request):
             product_id = str(data.get('product_id'))
             quantity = int(data.get('quantity'))
 
+            cart = request.session.get('cart', {})  # Ensure cart exists
+
             if quantity < 1:
-                quantity = 1  # Prevent invalid values
-
-            cart = request.session.get('cart', {})
-
-            if product_id in cart:
+                cart.pop(product_id, None)  # Remove item if quantity < 1
+            else:
                 cart[product_id] = quantity
-                request.session['cart'] = cart  # Save updated cart
+
+            request.session['cart'] = cart  # Save updated cart
 
             return JsonResponse({'success': True, 'cart': cart})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
-    
+
     return JsonResponse({'success': False, 'error': 'Invalid request method'})

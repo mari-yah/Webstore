@@ -11,10 +11,10 @@
         <div class="form-container">
             {% if is_signup %}
                 <!-- Signup Form -->
-                <form id="signupForm" class="form active" method="POST">
+                <form id="signupForm" class="form active" method="POST" action="{% url 'signup' %}">
                     {% csrf_token %}
                     <h2>Register</h2>
-                    {{ form.as_p }} <!-- Render the form fields for signup dynamically from Django -->
+                    {{ form.as_p }} <!-- This will correctly render username, email, and password fields -->
                     <div class="strength-indicator">
                         <div class="strength-bar" id="strengthBar"></div>
                     </div>
@@ -27,11 +27,10 @@
                 </form>
             {% else %}
                 <!-- Login Form -->
-                <form id="loginForm" class="form active" method="POST">
+                <form id="loginForm" class="form active" method="POST" action="{% url 'login' %}">
                     {% csrf_token %}
                     <h2>Login</h2>
-                    <input type="text" name="username_or_email" placeholder="Username or Email" required>
-                    <input type="password" name="password" placeholder="Password" required>
+                    {{ login_form.as_p }}  <!-- Replace manual inputs with Django form -->
                     <div class="remember-me">
                         <input type="checkbox" id="rememberMe" name="remember_me">
                         <span><label for="rememberMe">Remember Me</label></span>
@@ -86,4 +85,9 @@
         });
     }
 </script>
+
+{% if error %}
+    <p class="error">{{ error }}</p>
+{% endif %}
+
 {% endblock %}
