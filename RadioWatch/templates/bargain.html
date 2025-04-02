@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bargain Price</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h2>Bargain Summary</h2>
-<p>Original Price: ₹{{ actual_price }}</p>
-<p>Discount Applied: {{ discount }}%</p>
-<p>Final Price: ₹{{ final_price }}</p>
-<a href="{% url 'cart' %}" class="btn btn-primary">Back to Cart</a>
+    <div class="container text-center mt-5">
+        <h2>Bargain Summary</h2>
+        <p>Original Total Price: ₹{{ original_price|default:"0.00" }}</p>
+        <p>Discount Applied: {{ discount|default:"0" }}%</p>
+        <p>Final Price: ₹{{ final_price|default:"0.00" }}</p>
+        <a href="{% url 'cart' %}" class="btn btn-primary mt-3">Back to Cart</a>
+    </div>
 </body>
 </html>
+

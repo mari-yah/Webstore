@@ -27,28 +27,38 @@ SECRET_KEY = 'django-insecure--%d#3^1s^611eslqt8#r%-cx7#!e@&ko!2gym5mw&oidp)rk3j
 DEBUG = True
 
 ALLOWED_HOSTS = []
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Default, stores sessions in the database
+LOGIN_REDIRECT_URL = '/'  # Redirect to home after login, adjust as needed
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend for authentication
+]
+SESSION_COOKIE_AGE = 3600  # Session timeout in seconds (default is 300 seconds or 5 minutes)
+SESSION_COOKIE_SECURE = False  # Ensures cookies are only sent over HTTPS
+CSRF_COOKIE_SECURE = False    # Ensures CSRF cookie is sent over HTTPS
 
+AUTH_USER_MODEL = 'RadioWatch.UserRadioWatch'
 
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.auth',  # REQUIRED for authentication system
+    'django.contrib.contenttypes',  # REQUIRED for auth models
+    'django.contrib.sessions',  # REQUIRED for login sessions
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'RadioWatch'
+    'RadioWatch',  # Your app
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',  # Manages sessions
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Associates users with requests
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'webstore.urls'

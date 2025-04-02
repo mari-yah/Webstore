@@ -10,6 +10,7 @@
     <div class="container">
         <div class="form-container">
             {% if is_signup %}
+
                 <!-- Signup Form -->
                 <form id="signupForm" class="form active" method="POST" action="{% url 'signup' %}">
                     {% csrf_token %}
@@ -26,6 +27,7 @@
                     <button type="submit">Register</button>
                 </form>
             {% else %}
+            
                 <!-- Login Form -->
                 <form id="loginForm" class="form active" method="POST" action="{% url 'login' %}">
                     {% csrf_token %}
