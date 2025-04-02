@@ -1,4 +1,4 @@
-    {% extends 'base.html' %}
+{% extends 'base.html' %}
     {% block content %}
     {% load static %}
 
@@ -60,7 +60,7 @@
                 <button type="submit" class="bargain-btn">Bargain Now</button>
             </form>
             {% else %}
-                <p>Please log in to access the bargain feature.</p>
+                <p>Please login to bargain.</p>
             {% endif %}
         </div>
     </div>
@@ -74,6 +74,10 @@
         </div>
         {% endif %}
         
+    {% else %}
+        <p class="empty-cart">Your cart is empty.</p>
+    {% endif %}
+</div>
 
     <script>
         $(document).ready(function() {
@@ -89,7 +93,7 @@
         }
 
         let newSubtotal = price * newQuantity;
-        subtotalElement.text(`₹${newSubtotal.toFixed(2)}`);
+        subtotalElement.text('₹${newSubtotal.toFixed(2)}');
 
         updateCartTotal();
         updateCartInBackend(productId, newQuantity);

@@ -1,21 +1,92 @@
 {% extends 'base.html' %}
-    {% block content %}
-    {% load static %}
-
+{% block content %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bargain Summary</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+        .bargain-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        .bargain-header {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .summary-box {
+            background: #e9f7ef;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .discount {
+            font-size: 1.2rem;
+            color: #dc3545;
+        }
+        .bargain-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+        .discount-info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
     <div class="container text-center mt-5">
-        <h2>Bargain Summary</h2>
-        
-        {% if message %}
-            <p>{{ message }}</p>
-        {% else %}
-            <p>Original Total Price: ₹{{ total_price|default:"0.00" }}</p>
-            <p>Discount Applied: {{ discount|default:"0" }}%</p>
-            <p>Final Price: ₹{{ final_price|default:"0.00" }}</p>
-        {% endif %}
-        
-        <a href="{% url 'cart' %}" class="btn btn-primary mt-3">Back to Cart</a>
+        <img src="/media/img/bargain.jpg" alt="Bargain Offer" class="bargain-image">
+        <div class="bargain-container">
+            <div class="bargain-container mt-4">  <!-- Added margin-top -->
+
+            <h2 class="bargain-header">Bargain Summary</h2>
+            {% if message %}
+                <p class="text-danger">{{ message }}</p>
+            {% else %}
+                <div class="summary-box">
+                    <p><strong>Original Price:</strong> <span class="price">₹{{ total_price|default:"0.00" }}</span></p>
+                    <p><strong>Discount Applied:</strong> <span class="discount">{{ discount|default:"0" }}%</span></p>
+                    <p><strong>Final Price:</strong> <span class="price">₹{{ final_price|default:"0.00" }}</span></p>
+                </div>
+            {% endif %}
+            <a href="{% url 'cart' %}" class="btn btn-primary mt-4">Back to Cart</a>
+        </div>
     </div>
-
-
-
-    {% endblock %}
+    
+    <!-- Discount Explanation Outside the Container -->
+    <div class="discount-info">
+        <h4>💰 How Do We Calculate Your Discounts? 💰</h4>
+        <p>🎉 First-time buyers get an instant <strong>5% OFF</strong> to celebrate their first purchase!</p>
+        <p>🛍️ Shop more, save more! If you've purchased <strong>5+ times</strong>, enjoy a <strong>10% OFF</strong>.</p>
+        <p>💎 Our VIP customers who’ve spent over <strong>₹10,00,000</strong> get a <strong>huge 20% OFF</strong>!</p>
+        <p>🎲 No special category? No worries! Every bargain is a surprise—you could get <strong>5% to 20% OFF</strong> at random!</p>
+    </div>
+</body>
+</html>
+{% endblock %}

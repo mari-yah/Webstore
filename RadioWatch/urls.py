@@ -12,7 +12,7 @@ urlpatterns = [
     path("signup/", signup_view, name="signup"),
     path("login/", login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
-    path('home/bargain_total/<int:user_id>/', views.bargain_total, name='bargain_total'),
+    path('bargain_total/<int:customer_id>/', bargain_total, name='bargain_total'),
 
     # Cart URLs
     path('cart/', views.cart, name='cart'),  # Correctly links to cart view
