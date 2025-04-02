@@ -11,6 +11,9 @@ from .models import Cart,UserRadioWatch, Product, Bargain, Customer
 from decimal import Decimal
 from django.contrib.auth.hashers import make_password, check_password
 import logging  
+import random
+from django.db.models import Sum
+
 
 # Home Page
 #@login_required
@@ -226,30 +229,53 @@ def product_list(request):
     
     return render(request, 'product_list.html', context)
 
-from django.shortcuts import render
-from .models import Cart
-import random
-from decimal import Decimal
+
 
 def bargain_total(request, customer_id):
-    cart_items = Cart.objects.filter(user_id=customer_id)
+    # Get Customer instance
+    customer = get_object_or_404(Customer, customer_id=customer_id)
+    user = customer.user  
+
+    # Get cart items (filter by user, not customer)
+    cart_items = Cart.objects.filter(user=user)
 
     if not cart_items.exists():
         return render(request, 'bargain.html', {'message': 'Your cart is empty.'})
 
-    # Convert prices to Decimal to ensure compatibility
-    original_price = sum(Decimal(item.product.price) * item.quantity for item in cart_items)
-    discount = Decimal(random.randint(5, 20))  # Random discount as Decimal
-    final_price = original_price - (original_price * discount / Decimal(100))
+    # ✅ Get total price from request (if sent)
+    total_price = request.GET.get('total_price')
 
+    if total_price is None:
+        # ✅ Calculate total price from the cart if not provided
+        total_price = cart_items.aggregate(total=Sum('product__price'))['total'] or Decimal(0)
+    else:
+        total_price = Decimal(total_price)  # Convert to Decimal
+
+    # ✅ Apply discount logic
+    discount = Decimal(0)
+
+    if customer.total_purchases == 0:
+        discount = Decimal(5)  # First-time customer
+    elif customer.total_purchases > 5:
+        discount = Decimal(10)  # Loyal customer
+    if customer.total_spent >= 1000000:
+        discount = max(discount, Decimal(20))  # High-value customer gets 20%
+
+    if discount == 0:
+        discount = Decimal(random.randint(5, 20))  # Random discount if no criteria met
+
+    # ✅ Calculate final price after discount
+    final_price = total_price - (total_price * discount / Decimal(100))
+
+    # ✅ Ensure proper rounding to 2 decimal places
     context = {
-        'original_price': original_price.quantize(Decimal("0.01")),  # Format to 2 decimal places
+        'total_price': total_price.quantize(Decimal("0.01")),
         'discount': discount,
-        'final_price': final_price.quantize(Decimal("0.01")),  # Format to 2 decimal places
+        'final_price': final_price.quantize(Decimal("0.01")),
+        'customer_id': customer_id,
     }
 
     return render(request, 'bargain.html', context)
-
 
 #quantity update in cart
 import json
