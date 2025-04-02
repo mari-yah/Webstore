@@ -1,5 +1,10 @@
 from django import forms
 from .models import UserRadioWatch
+from django.contrib.auth.forms import AuthenticationForm
+
+class LoginForm(AuthenticationForm):
+    # Customize this form as needed
+    pass
 
 class UserRadioWatchForm(forms.ModelForm):
     password1 = forms.CharField(widget=forms.PasswordInput)
@@ -13,19 +18,20 @@ class UserRadioWatchForm(forms.ModelForm):
         cleaned_data = super().clean()
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
-
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Passwords do not match.")
-
         return cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.password = self.cleaned_data["password1"]  # Manually storing password
+        user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
         return user
-
+    
+#class LoginForm(forms.Form):
+    #username_or_email = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'placeholder': 'Username or Email'}))
+    #password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
 
 
 

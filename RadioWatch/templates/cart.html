@@ -29,7 +29,7 @@
                         <input type="number" class="quantity" value="{{ item.quantity }}" min="1" data-product-id="{{ item.product_id }}">
                     </td>
                     <td class="price">₹{{ item.price|floatformat:2 }}</td>
-                    <td class="subtotal">₹{{ item.subtotal|floatformat:2 }}</td>
+                    <td class="subtotal">₹{{ item.price|floatformat:2|add:item.quantity|floatformat:2 }}</td>
 
                     <td>
                         <form action="{% url 'remove_from_cart' item.product_id %}" method="post">
@@ -37,25 +37,11 @@
                             <button type="submit" class="button remove-btn">Remove</button>
                         </form>
                     </td>
-                    <td>
-                        {% if request.user.is_authenticated %}
-                            {% if not bargain or item.product_id not in bargain.applied_products %}
-                                <form method="GET" action="{% url 'bargain_product' customer_id=request.user.id product_id=item.product_id %}">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-success">Bargain Now</button>
-                                </form>
-                            {% else %}
-                                <p>Bargain Applied!</p>
-                            {% endif %}
-                        {% else %}
-                            <p>Please login to bargain.</p>
-                        {% endif %}
-                    </td>
+
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <p>User ID: {{ request.user.id }}</p>
 
         <p class="total-price"><strong>Total:</strong> ₹<span id="total-price">{{ total_price|floatformat:2 }}</span></p>
         
@@ -66,7 +52,15 @@
             </form>
             <a href="#" class="button checkout-btn">Proceed to Checkout</a>
         </div>
-
+        <div class="bargain-container">
+            {% if request.user.is_authenticated and customer_id %}
+        <form method="GET" action="{% url 'bargain_total' customer_id=customer_id %}">
+                    <button type="submit" class="bargain-btn">Bargain Now</button>
+                </form>
+            {% else %}
+                <p>Please login to bargain.</p>
+            {% endif %}
+        </div>
         {% if bargain %}
         <div class="summary">
             <h3>Bargain Summary</h3>
