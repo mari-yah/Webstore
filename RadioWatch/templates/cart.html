@@ -44,11 +44,6 @@
 
         <p class="total-price"><strong>Total:</strong> ₹<span id="total-price">{{ total_price|floatformat:2 }}</span></p>
         
-<<<<<<< HEAD
-        <div class="bargain-container">
-            {% if request.user.is_authenticated %}
-                <a href="{% url 'bargain_total' user_id=request.user.id %}" class="btn btn-success">Check Bargain</a>
-=======
         <div class="cart-buttons">
             <form action="{% url 'clear_cart' %}" method="post">
                 {% csrf_token %}
@@ -64,21 +59,10 @@
                 <input type="hidden" name="total_price" value="{{ total_price }}">
                 <button type="submit" class="bargain-btn">Bargain Now</button>
             </form>
->>>>>>> ac1a3bb45bf13160ecba24d233d4a65d72f74360
             {% else %}
                 <p>Please log in to access the bargain feature.</p>
             {% endif %}
         </div>
-<<<<<<< HEAD
-        
-        {% if bargain %}
-            <div class="summary">
-                <h3>Bargain Summary</h3>
-                <p>Original Price: ₹{{ bargain.original_price|floatformat:2 }}</p>
-                <p>Discount: {{ bargain.discount }}%</p>
-                <p>Final Price: ₹{{ bargain.final_price|floatformat:2 }}</p>
-            </div>
-=======
     </div>
     
         {% if bargain %}
@@ -88,7 +72,6 @@
             <p>Discount: {{ bargain.discount }}%</p>
             <p>Final Price: ₹{{ bargain.final_price|floatformat:2 }}</p>
         </div>
->>>>>>> ac1a3bb45bf13160ecba24d233d4a65d72f74360
         {% endif %}
         
 

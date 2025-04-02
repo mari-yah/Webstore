@@ -231,11 +231,6 @@ def product_list(request):
 
 
 
-<<<<<<< HEAD
-
-def bargain_total(request, user_id):  # Ensure URL and view use the same parameter name
-    cart_items = Cart.objects.filter(user_id=user_id)
-=======
 def bargain_total(request, customer_id):
     # Get Customer instance
     customer = get_object_or_404(Customer, customer_id=customer_id)
@@ -243,25 +238,12 @@ def bargain_total(request, customer_id):
 
     # Get cart items (filter by user, not customer)
     cart_items = Cart.objects.filter(user=user)
->>>>>>> ac1a3bb45bf13160ecba24d233d4a65d72f74360
 
     if not cart_items.exists():
         return render(request, 'bargain.html', {'message': 'Your cart is empty.'})
 
-<<<<<<< HEAD
-    print("DEBUG: Cart Items Found ->", cart_items)  # Debugging statement
-
-    # ✅ Ensure correct price calculation
-    original_price = sum(Decimal(str(item.product.price)) * item.quantity for item in cart_items)
-    discount_percentage = Decimal(random.randint(5, 20))  # Random discount (5% to 20%)
-    discount_amount = (original_price * discount_percentage) / Decimal(100)
-    final_price = original_price - discount_amount
-
-    print(f"DEBUG: Original Price: {original_price}, Discount: {discount_percentage}%, Final Price: {final_price}")
-=======
     # ✅ Get total price from request (if sent)
     total_price = request.GET.get('total_price')
->>>>>>> ac1a3bb45bf13160ecba24d233d4a65d72f74360
 
     if total_price is None:
         # ✅ Calculate total price from the cart if not provided
@@ -287,16 +269,10 @@ def bargain_total(request, customer_id):
 
     # ✅ Ensure proper rounding to 2 decimal places
     context = {
-<<<<<<< HEAD
-        'original_price': original_price.quantize(Decimal("0.01")),  # Format to 2 decimal places
-        'discount': discount_percentage,
-        'final_price': final_price.quantize(Decimal("0.01")),  # Format to 2 decimal places
-=======
         'total_price': total_price.quantize(Decimal("0.01")),
         'discount': discount,
         'final_price': final_price.quantize(Decimal("0.01")),
         'customer_id': customer_id,
->>>>>>> ac1a3bb45bf13160ecba24d233d4a65d72f74360
     }
 
     return render(request, 'bargain.html', context)
