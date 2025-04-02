@@ -310,3 +310,83 @@ def update_cart_quantity(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+
+    #checkout view
+
+
+def checkout(request):
+    user = request.user
+    try:
+        customer = Customer.objects.get(user=user)  # ✅ Get Customer linked to User
+    except Customer.DoesNotExist:
+        return HttpResponse("Customer profile not found.", content_type="text/plain")
+
+    cart_items = Cart.objects.filter(user=user)  # ✅ Use `user=user` instead of `customer`
+
+    if not cart_items.exists():
+        return HttpResponse("Your cart is empty.", content_type="text/plain")
+
+    # Calculate total and apply discount
+    total_price = sum(item.product.price * item.quantity for item in cart_items)
+    discount = 10  # Example discount (adjust as needed)
+    discount_amount = (total_price * discount) / 100
+    final_price = total_price - discount_amount
+
+    # Save purchase details to PurchaseHistory
+    purchase_records = []
+    purchase_time = now()
+    for item in cart_items:
+        purchase = PurchaseHistory.objects.create(
+            customer=customer,
+            product=item.product,
+            purchase_price=item.product.price,  # Store individual product price
+            purchase_date=purchase_time
+        )
+        purchase_records.append(purchase)
+
+    # ✅ Clear cart after checkout
+    cart_items.delete()
+
+    # Generate PDF invoice
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'
+
+    pdf = canvas.Canvas(response, pagesize=letter)
+    pdf.setFont("Helvetica", 12)
+
+    y_position = 750  # Start position for text
+
+    # **Header Information**
+    pdf.drawString(50, y_position, f"Purchase ID: {purchase_records[0].purchase_id}")
+    pdf.drawString(300, y_position, f"Date: {purchase_time.strftime('%Y-%m-%d')}")
+    pdf.drawString(50, y_position - 20, f"Customer: {user.user_name}")
+    y_position -= 40
+
+    # **Table Header**
+    pdf.drawString(50, y_position, "Product Name")
+    pdf.drawString(300, y_position, "Price")
+    pdf.drawString(400, y_position, "Quantity")
+    pdf.drawString(500, y_position, "Subtotal")
+    y_position -= 20
+
+    for item in purchase_records:  # ✅ Iterate over saved purchases instead of cart_items
+        subtotal = item.purchase_price
+        pdf.drawString(50, y_position, item.product.product_name)  # ✅ Fixed field name
+        pdf.drawString(300, y_position, f"₹{item.purchase_price:.2f}")
+        pdf.drawString(400, y_position, "1")  # PurchaseHistory stores individual items
+        pdf.drawString(500, y_position, f"₹{subtotal:.2f}")
+        y_position -= 20
+
+    # **Subtotal & Discount**
+    y_position -= 20
+    pdf.drawString(50, y_position, f"Subtotal: ₹{total_price:.2f}")
+    pdf.drawString(50, y_position - 20, f"Discount ({discount}%): ₹{discount_amount:.2f}")
+    pdf.drawString(50, y_position - 40, f"Final Price: ₹{final_price:.2f}")
+
+    # **Thank You Message**
+    pdf.drawString(50, y_position - 80, "Thank you for shopping with us! We appreciate your business.")
+
+    pdf.save()
+    return response
