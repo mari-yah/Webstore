@@ -1,19 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bargain Price</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-</head>
-<body>
+{% extends 'base.html' %}
+    {% block content %}
+    {% load static %}
+
     <div class="container text-center mt-5">
         <h2>Bargain Summary</h2>
-        <p>Original Total Price: ₹{{ original_price|default:"0.00" }}</p>
-        <p>Discount Applied: {{ discount|default:"0" }}%</p>
-        <p>Final Price: ₹{{ final_price|default:"0.00" }}</p>
+        
+        {% if message %}
+            <p>{{ message }}</p>
+        {% else %}
+            <p>Original Total Price: ₹{{ total_price|default:"0.00" }}</p>
+            <p>Discount Applied: {{ discount|default:"0" }}%</p>
+            <p>Final Price: ₹{{ final_price|default:"0.00" }}</p>
+        {% endif %}
+        
         <a href="{% url 'cart' %}" class="btn btn-primary mt-3">Back to Cart</a>
     </div>
-</body>
-</html>
 
+
+
+    {% endblock %}
