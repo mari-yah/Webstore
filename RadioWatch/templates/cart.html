@@ -1,4 +1,4 @@
-    {% extends 'base.html' %}
+{% extends 'base.html' %}
     {% block content %}
     {% load static %}
 
@@ -92,8 +92,8 @@
                     newQuantity = 1;
                 }
 
-                let newSubtotal = price * newQuantity;
-                subtotalElement.text(`₹${newSubtotal.toFixed(2)}`);
+        let newSubtotal = price * newQuantity;
+        subtotalElement.text(`₹${newSubtotal.toFixed(2)}`);
 
                 updateCartTotal();
                 updateCartInBackend(productId, newQuantity);
