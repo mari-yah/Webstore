@@ -231,20 +231,26 @@ from .models import Cart
 import random
 from decimal import Decimal
 
-def bargain_total(request, customer_id):
-    cart_items = Cart.objects.filter(user_id=customer_id)
+
+def bargain_total(request, user_id):  # Ensure URL and view use the same parameter name
+    cart_items = Cart.objects.filter(user_id=user_id)
 
     if not cart_items.exists():
         return render(request, 'bargain.html', {'message': 'Your cart is empty.'})
 
-    # Convert prices to Decimal to ensure compatibility
-    original_price = sum(Decimal(item.product.price) * item.quantity for item in cart_items)
-    discount = Decimal(random.randint(5, 20))  # Random discount as Decimal
-    final_price = original_price - (original_price * discount / Decimal(100))
+    print("DEBUG: Cart Items Found ->", cart_items)  # Debugging statement
+
+    # ✅ Ensure correct price calculation
+    original_price = sum(Decimal(str(item.product.price)) * item.quantity for item in cart_items)
+    discount_percentage = Decimal(random.randint(5, 20))  # Random discount (5% to 20%)
+    discount_amount = (original_price * discount_percentage) / Decimal(100)
+    final_price = original_price - discount_amount
+
+    print(f"DEBUG: Original Price: {original_price}, Discount: {discount_percentage}%, Final Price: {final_price}")
 
     context = {
         'original_price': original_price.quantize(Decimal("0.01")),  # Format to 2 decimal places
-        'discount': discount,
+        'discount': discount_percentage,
         'final_price': final_price.quantize(Decimal("0.01")),  # Format to 2 decimal places
     }
 
