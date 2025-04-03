@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import LoginForm
 from RadioWatch.forms import UserRadioWatchForm
-from .models import Cart,UserRadioWatch, Product, Bargain, Customer, PurchaseHistory
+from .models import Cart,UserRadioWatch, Product, Customer, PurchaseHistory
 from decimal import Decimal
 from django.contrib.auth.hashers import make_password, check_password
 import logging  
@@ -237,51 +237,62 @@ def product_list(request):
 
 
 
+from django.shortcuts import get_object_or_404, render
+from django.db.models import Sum
+from decimal import Decimal
+import random
+from .models import Customer, Cart, PurchaseHistory
+
 def bargain_total(request, customer_id):
-    # Get Customer instance
     customer = get_object_or_404(Customer, customer_id=customer_id)
     user = customer.user  
 
-    # Get cart items (filter by user, not customer)
     cart_items = Cart.objects.filter(user=user)
 
     if not cart_items.exists():
         return render(request, 'bargain.html', {'message': 'Your cart is empty.'})
 
-    # ✅ Get total price from request (if sent)
-    total_price = request.GET.get('total_price')
+    # ✅ Calculate total price of the cart
+    total_price = cart_items.aggregate(total=Sum('product__price'))['total'] or Decimal(0)
 
-    if total_price is None:
-        # ✅ Calculate total price from the cart if not provided
-        total_price = cart_items.aggregate(total=Sum('product__price'))['total'] or Decimal(0)
+    # ✅ Apply discount logic based on past purchases
+    purchase_count = PurchaseHistory.objects.filter(customer=customer).count()
+    discount_percentage = Decimal(0)
+
+    if total_price > 1000000:
+        discount_percentage = Decimal(20)
     else:
-        total_price = Decimal(total_price)  # Convert to Decimal
-
-    # ✅ Apply discount logic
-    discount = Decimal(0)
-
-    if customer.total_purchases == 0:
-        discount = Decimal(5)  # First-time customer
-    elif customer.total_purchases > 5:
-        discount = Decimal(10)  # Loyal customer
-    if customer.total_spent >= 1000000:
-        discount = max(discount, Decimal(20))  # High-value customer gets 20%
-
-    if discount == 0:
-        discount = Decimal(random.randint(5, 20))  # Random discount if no criteria met
+        if purchase_count == 0:
+            discount_percentage = Decimal(10)
+        elif purchase_count == 1:
+            discount_percentage = Decimal(0)
+        elif purchase_count == 4:
+            discount_percentage = Decimal(15)
+        elif purchase_count in [2, 3, 5, 6, 7, 8, 9]:
+            discount_percentage = Decimal(5) if random.choice([True, False]) else Decimal(0)
 
     # ✅ Calculate final price after discount
-    final_price = total_price - (total_price * discount / Decimal(100))
+    discount_amount = (total_price * discount_percentage) / 100
+    final_price = total_price - discount_amount
 
-    # ✅ Ensure proper rounding to 2 decimal places
+    # ✅ Store discount details in session (cart remains unchanged)
+    request.session['bargain_discount'] = {
+        'total_price': str(total_price),
+        'discount_percentage': str(discount_percentage),
+        'final_price': str(final_price)
+    }
+
+    # ✅ Ensure proper rounding
     context = {
         'total_price': total_price.quantize(Decimal("0.01")),
-        'discount': discount,
+        'discount': discount_percentage if discount_percentage > 0 else "No Discount",
         'final_price': final_price.quantize(Decimal("0.01")),
         'customer_id': customer_id,
     }
 
     return render(request, 'bargain.html', context)
+
+
 
 #quantity update in cart
 import json
@@ -316,40 +327,75 @@ def update_cart_quantity(request):
     #checkout view
 
 
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from decimal import Decimal
+from datetime import datetime
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from .models import Cart, PurchaseHistory, Customer
+
 def checkout(request):
     user = request.user
     try:
-        customer = Customer.objects.get(user=user)  # ✅ Get Customer linked to User
+        customer = Customer.objects.get(user=user)  # ✅ Fetch Customer profile
     except Customer.DoesNotExist:
         return HttpResponse("Customer profile not found.", content_type="text/plain")
 
-    cart_items = Cart.objects.filter(user=user)  # ✅ Use `user=user` instead of `customer`
-
+    cart_items = Cart.objects.filter(user=user)  # ✅ Fetch Cart items
     if not cart_items.exists():
         return HttpResponse("Your cart is empty.", content_type="text/plain")
 
-    # Calculate total and apply discount
-    total_price = sum(item.product.price * item.quantity for item in cart_items)
-    discount = 10  # Example discount (adjust as needed)
-    discount_amount = (total_price * discount) / 100
-    final_price = total_price - discount_amount
-
-    # Save purchase details to PurchaseHistory
+    purchase_time = datetime.now()
     purchase_records = []
-    purchase_time = now()
+
+    total_cart_price = Decimal(0)
+    total_cart_discount = Decimal(0)
+    final_cart_price = Decimal(0)
+
+    # ✅ Retrieve Bargain Discount from Session (if available)
+    bargain_discount = request.session.get("bargain_discount", None)
+    if bargain_discount:
+        total_price = Decimal(bargain_discount["total_price"])
+        discount_percentage = Decimal(bargain_discount["discount_percentage"])
+        final_price = Decimal(bargain_discount["final_price"])
+    else:
+        total_price = cart_items.aggregate(total=Sum('product__price'))['total'] or Decimal(0)
+        discount_percentage = Decimal(0)
+        final_price = total_price
+
     for item in cart_items:
+        item_total = item.product.price * item.quantity
+        discount_amount = (item_total * discount_percentage) / 100
+        item_final_price = item_total - discount_amount
+
+        # ✅ Store the purchase record
         purchase = PurchaseHistory.objects.create(
             customer=customer,
             product=item.product,
-            purchase_price=item.product.price,  # Store individual product price
-            purchase_date=purchase_time
+            quantity=item.quantity,
+            purchase_price=item.product.price,
+            total_price=item_total,
+            discount_percentage=discount_percentage,
+            final_price=item_final_price
         )
         purchase_records.append(purchase)
 
-    # ✅ Clear cart after checkout
-    cart_items.delete()
+        # ✅ Update Totals for Invoice
+        total_cart_price += item_total
+        total_cart_discount += discount_amount
+        final_cart_price += item_final_price
 
-    # Generate PDF invoice
+    # ✅ Update Customer Purchase History
+    customer.total_purchases += cart_items.count()
+    customer.total_spent += final_cart_price
+    customer.save()
+
+    # ✅ Clear Cart After Checkout
+    cart_items.delete()
+    request.session.pop("bargain_discount", None)  # Remove bargain discount after checkout
+
+    # ✅ Generate PDF Invoice
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="invoice.pdf"'
 
@@ -366,27 +412,26 @@ def checkout(request):
 
     # **Table Header**
     pdf.drawString(50, y_position, "Product Name")
-    pdf.drawString(300, y_position, "Price")
-    pdf.drawString(400, y_position, "Quantity")
-    pdf.drawString(500, y_position, "Subtotal")
+    pdf.drawString(250, y_position, "Price")
+    pdf.drawString(350, y_position, "Quantity")
+    pdf.drawString(450, y_position, "Subtotal")
     y_position -= 20
 
-    for item in purchase_records:  # ✅ Iterate over saved purchases instead of cart_items
-        subtotal = item.purchase_price
-        pdf.drawString(50, y_position, item.product.product_name)  # ✅ Fixed field name
-        pdf.drawString(300, y_position, f"₹{item.purchase_price:.2f}")
-        pdf.drawString(400, y_position, "1")  # PurchaseHistory stores individual items
-        pdf.drawString(500, y_position, f"₹{subtotal:.2f}")
+    for item in purchase_records:
+        pdf.drawString(50, y_position, item.product.product_name)
+        pdf.drawString(250, y_position, f"{item.purchase_price:.2f}")
+        pdf.drawString(350, y_position, str(item.quantity))
+        pdf.drawString(450, y_position, f"{item.total_price:.2f}")
         y_position -= 20
 
     # **Subtotal & Discount**
     y_position -= 20
-    pdf.drawString(50, y_position, f"Subtotal: ₹{total_price:.2f}")
-    pdf.drawString(50, y_position - 20, f"Discount ({discount}%): ₹{discount_amount:.2f}")
-    pdf.drawString(50, y_position - 40, f"Final Price: ₹{final_price:.2f}")
+    pdf.drawString(50, y_position, f"Subtotal: {total_cart_price:.2f}")
+    pdf.drawString(50, y_position - 20, f"Discount: {total_cart_discount:.2f}")
+    pdf.drawString(50, y_position - 40, f"Final Price: {final_cart_price:.2f}")
 
     # **Thank You Message**
-    pdf.drawString(50, y_position - 80, "Thank you for shopping with us! We appreciate your business.")
+    pdf.drawString(50, y_position - 80, "Thank you for shopping with us!")
 
     pdf.save()
     return response
