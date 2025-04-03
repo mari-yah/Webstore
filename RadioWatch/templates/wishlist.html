@@ -1,15 +1,211 @@
 {% extends 'base.html' %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/wishlist_styles.css' %}?v=2">
 
 {% block content %}
-    <main class="wishlist-page">
-        <div class="wishlist-container">
-            <h3 class="wishlist-title">Your Wishlist</h3>
-            <div class="wishlist-items"></div>
-            <p class="wishlist-empty" style="display: none;">Your wishlist is empty. <a href="/">Browse products</a> to add items!</p>
-        </div>
-    </main>
+<style>
+    /* Wishlist Page Styling */
+    .wishlist-container {
+        max-width: 1100px;
+        margin: 50px auto;
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        text-align: center;
+    }
 
-    <script src="{% static 'js/main.js' %}"></script>
+    .wishlist-title {
+        font-size: 34px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 25px;
+        text-transform: uppercase;
+    }
+
+    /* Wishlist Grid Layout */
+    .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .wishlist-item {
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        overflow: hidden;
+    }
+
+    .wishlist-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* FIXED IMAGE STYLING */
+    .wishlist-item img {
+        width: 100%;
+        height: 200px;
+        object-fit: contain; /* Keeps aspect ratio without cropping */
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background: #f8f8f8;
+    }
+
+    .wishlist-item-details {
+        padding: 10px;
+    }
+
+    .wishlist-item-name {
+        font-size: 20px;
+        font-weight: bold;
+        color: #444;
+        margin-bottom: 5px;
+    }
+
+    .wishlist-item-price {
+        font-size: 18px;
+        color: #28a745;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    /* Buttons */
+    .wishlist-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .add-to-cart-btn,
+    .remove-wishlist-btn {
+        padding: 10px 16px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .add-to-cart-btn {
+        background:  hsl(31, 100%, 70%);;
+        color: rgb(0, 0, 0);
+    }
+
+    .add-to-cart-btn:hover {
+        background: #0056b3;
+        transform: scale(1.05);
+    }
+
+    .remove-wishlist-btn {
+        background: #ff4d4d;
+        color: white;
+    }
+
+    .remove-wishlist-btn:hover {
+        background: #e60000;
+        transform: scale(1.05);
+    }
+
+    /* Empty Wishlist Message */
+    .wishlist-empty {
+        font-size: 20px;
+        color: #666;
+        margin-top: 20px;
+    }
+
+    .wishlist-empty a {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .wishlist-empty a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<main class="wishlist-page">
+    <div class="wishlist-container">
+        <h3 class="wishlist-title">Your Wishlist</h3>
+
+        {% if wishlist_items %}
+            <div class="wishlist-grid">
+                {% for item in wishlist_items %}
+                <div class="wishlist-item">
+                    <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                    <div class="wishlist-item-details">
+                        <p class="wishlist-item-name">{{ item.name }}</p>
+                        <p class="wishlist-item-price">₹{{ item.price|floatformat:2 }}</p>
+                        <div class="wishlist-buttons">
+                            <form id="addToCartForm_{{ item.product_id }}" action="{% url 'add_to_cart' item.product_id %}" method="post">
+                                {% csrf_token %}
+                                <button type="button" class="add-to-cart-btn" onclick="addToCartAndShowPopup('{{ item.product_id }}')">
+                                    Add to Cart
+                                </button>
+                            </form>
+                            
+                            
+                            
+                            <form action="{% url 'remove_from_wishlist' item.product_id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="remove-wishlist-btn">Remove</button>
+                            </form>
+                            <div id="cart-popup" class="cart-popup">
+                                <p>Item added to cart!</p>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="wishlist-empty">Your wishlist is empty. <a href="/">Browse products</a> to add items!</p>
+        {% endif %}
+    </div>
+</main>
+
+<script>
+    function addToCartAndRedirect(productId) {
+        document.getElementById("addToCartForm_" + productId).submit();
+        setTimeout(function () {
+            window.location.href = "{% url 'cart' %}";  // Ensure 'cart_page' is the correct URL name
+        }, 500);  // Delay to ensure the request completes
+    }
+    </script>
+    <script>
+        function addToCartAndShowPopup(productId) {
+            // Show the popup
+            let popup = document.getElementById("cart-popup");
+            if (!popup) {
+                console.error("Cart popup not found!");
+                return;
+            }
+        
+            popup.style.display = "block";
+            popup.style.opacity = "1";
+        
+            // Hide popup after 2 seconds
+            setTimeout(function () {
+                popup.style.opacity = "0";
+                setTimeout(() => { popup.style.display = "none"; }, 500);
+            }, 2000);
+        
+            // Submit the form (adds item to cart)
+            setTimeout(function () {
+                document.getElementById("addToCartForm_" + productId).submit();
+            }, 500);
+        
+            // Redirect to cart after 2.5 seconds
+            setTimeout(function () {
+                window.location.href = "{% url 'cart' %}";  // Change 'cart_page' to your actual cart URL
+            }, 2500);
+        }
+        </script>
+    
 {% endblock %}

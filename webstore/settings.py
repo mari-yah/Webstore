@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Default, stores sessions in the database
+SESSION_COOKIE_AGE = 0  # Expire session immediately on logout
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # Destroy session when browser closes
 LOGIN_REDIRECT_URL = '/'  # Redirect to home after login, adjust as needed
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default backend for authentication

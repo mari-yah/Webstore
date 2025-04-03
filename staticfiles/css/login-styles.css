@@ -138,6 +138,17 @@ h2 {
   margin-bottom: 20px; /* Optional: Adds space below the heading */
 }
 
+.logout-container {
+  text-align: right; /* Align content to the right */
+  margin-right: 10px;
+}
+
+.logout-btn {
+  padding: 3px 6px;
+  font-size: 12px;
+  width: auto;
+  min-width: 50px;
+}
 
 
 

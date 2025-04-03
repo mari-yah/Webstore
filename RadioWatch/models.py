@@ -92,36 +92,31 @@ class Customer(models.Model):
 class PurchaseHistory(models.Model):
     purchase_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    purchase_price = models.DecimalField(max_digits=10, decimal_places=2)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.PositiveIntegerField(default=1)
+    purchase_price = models.DecimalField(max_digits=10, decimal_places=2)  # Price per item
     purchase_date = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Purchase {self.purchase_id}: Customer {self.customer.customer_id} - Product {self.product.product_id}"
-
-
-class Bargain(models.Model):
-    bargain_id = models.AutoField(primary_key=True)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    # New fields for order total
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     final_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
 
-    def calculate_discounted_price(self):
-        actual_price = self.product.price
-        discount = 0
-
-        if self.customer.total_purchases > 5:
-            discount = max(discount, 10)
-
-        if self.customer.total_spent >= 20000:
-            discount = max(discount, 20)
-
-        if self.customer.total_purchases == 0:
-            discount = max(discount, 5)
-
-        self.final_price = (actual_price * (1 - Decimal(discount) / 100)).quantize(Decimal("0.00"))
-        self.save()
-        return self.final_price
+    def save(self, *args, **kwargs):
+        if not self.total_price:
+            self.total_price = self.purchase_price * self.quantity
+        
+        if self.discount_percentage is not None:
+            discount_amount = (self.total_price * self.discount_percentage) / 100
+            self.final_price = self.total_price - discount_amount
+        else:
+            self.final_price = self.total_price
+        
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Bargain {self.bargain_id}: Customer {self.customer.customer_id} - Product {self.product.product_id} - Final Price {self.final_price}"
+        product_name = self.product.product_name if self.product else "Unknown Product"
+        return f"Purchase {self.purchase_id} - {self.customer.user.user_name} - {product_name}"
+
+
+

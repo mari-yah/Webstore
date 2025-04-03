@@ -21,19 +21,28 @@
                             </button>
                         </form>
 
-                        <!-- Wishlist Button -->
-                        <button type="button" class="action-button wishlist">
-                            <i class="fas fa-heart"></i> <span>Add to Wishlist</span>
-                        </button>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
+                        <div id="cart-popup" class="cart-popup">
+                            <p>Item added to cart!</p>
+                        </div>
 
-    <div id="cart-popup" class="cart-popup">
-        <p>Item added to cart!</p>
-    </div>
+                        <div class="product-actions">
+                            <!-- Add to Wishlist Form -->
+                            <form id="addToWishlistForm_{{ product.product_id }}" action="{% url 'add_to_wishlist' product.product_id %}" method="post">
+                                {% csrf_token %}
+                                <button type="button" class="action-button add-to-wishlist" onclick="confirmAddToWishlist('{{ product.product_id }}')">
+                                    <i class="fas fa-heart"></i> <span>Add to Wishlist</span>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Wishlist Pop-up -->
+                        <div id="wishlist-popup-{{ product.product_id }}" class="wishlist-popup">
+                            <p>Item added to Wishlist!</p>
+                        </div>
+                    </div>  <!-- Closing product-actions -->
+                </div>  <!-- Closing product-item -->
+                {% endfor %}
+
 
     <script>
         function confirmAddToCart(productId) {
@@ -61,4 +70,100 @@
             }, 500);
         }
     </script>
+
+<script>
+function confirmAddToWishlist(productId) {
+    console.log("Add to Wishlist button clicked for product ID:", productId); // ✅ Debugging Log
+
+    let popup = document.getElementById("wishlist-popup-" + productId); // ✅ Select correct product-specific popup
+
+    if (!popup) {
+        console.error("Wishlist pop-up element not found for product ID:", productId); // ✅ Debugging Error
+        return;
+    }
+
+    popup.style.display = "block"; // ✅ Show pop-up
+    popup.style.opacity = "1";     // ✅ Ensure visibility
+
+    setTimeout(function () {
+        popup.style.opacity = "0";  // ✅ Fade out effect
+        setTimeout(() => { popup.style.display = "none"; }, 500); // ✅ Hide completely
+    }, 5000);
+
+    // ✅ Submit form after showing pop-up
+    setTimeout(function () {
+        document.getElementById("addToWishlistForm_" + productId).submit();
+    }, 500);
+}
+
+</script>
+
+<style>
+    /* Wishlist Popup Styling */
+    .wishlist-popup {
+        position: fixed;
+        bottom: 20px; /* Positioned at the bottom */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #d4edda; /* Light green background */
+        color: #155724; /* Dark green text */
+        padding: 15px 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: none; /* Initially hidden */
+        font-size: 1rem;
+        font-weight: bold;
+        text-align: center;
+        animation: fadeIn 0.5s;
+    }
+
+    /* Fade-in Animation */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    .product-actions {
+    display: flex;
+    justify-content: center; /* Align buttons horizontally */
+    align-items: center; /* Align buttons vertically */
+    gap: 10px; /* Space between buttons */
+    margin-top: 10px;
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    height: 40px; /* Ensures both buttons have the same height */
+    line-height: normal;
+}
+
+.add-to-cart {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.add-to-cart:hover {
+    background-color: #388E3C;
+}
+
+.add-to-wishlist {
+    background-color: #ff4081;
+    color: white;
+}
+
+.add-to-wishlist:hover {
+    background-color: #d81b60;
+}
+
+
+</style>
+
 {% endblock %}
