@@ -82,7 +82,7 @@ body {
 
 .product-card {
     background: white;
-    padding: 15px;
+    padding: 10px;
     border-radius: 8px;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -117,7 +117,7 @@ body {
 .add-to-cart,
 .add-to-wishlist {
     display: block;
-    width: 100%;
+    width: 80%;
     padding: 10px;
     border: none;
     border-radius: 25px;
