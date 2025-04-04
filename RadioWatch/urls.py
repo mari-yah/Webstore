@@ -37,6 +37,7 @@ urlpatterns = [
 
     #checkout 
     path('checkout/', views.checkout, name='checkout'),
+    path('about/', views.about, name='about'),
 
     
 ]

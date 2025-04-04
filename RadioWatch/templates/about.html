@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% extends 'base.html' %}
+    {% block content %}
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/cart-styles.css' %}">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background-color: #222;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            font-size: 24px;
+        }
+
+        .about-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .about-content h2, .about-content h3 {
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        .about-content p, .about-content ul {
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .about-content ul {
+            padding-left: 20px;
+        }
+
+        .about-content a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .about-content a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>About Us</h1>
+    </header>
+
+    <section class="about-container">
+        <div class="about-content">
+            <h1>Welcome to Radio Watch</h1>
+            <p>At <strong>Radio Watch</strong>, we believe a watch is more than just a timepiece—it’s a statement of style, personality, and sophistication.</p>
+<br><br>
+            <h2>Our Story</h2>
+            <p>Founded with a passion for timeless elegance, <strong>Radio Watch</strong> curates a collection of high-quality, stylish, and affordable watches.</p>
+            <br><br>
+            <h2>💎 Why Choose Us?</h2>
+            <ul>
+                <li><strong>Premium Quality:</strong> We bring you watches crafted with precision.</li>
+                <li><strong>Affordable Luxury:</strong> Luxury should be accessible to all.</li>
+                <li><strong>Customer Satisfaction:</strong> We value our customers above everything.</li>
+            </ul>
+            <br><br>
+            <h3>📞 Get in Touch</h3>
+            <p>Have questions? We’d love to hear from you! Contact us at <a href="mailto:support@radiowatch.com">support@radiowatch.com</a></p>
+        </div>
+    </section>
+
+{% endblock %}
+</body>
+</html>

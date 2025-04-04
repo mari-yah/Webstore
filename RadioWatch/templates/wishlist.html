@@ -165,7 +165,7 @@
                 {% endfor %}
             </div>
         {% else %}
-            <p class="wishlist-empty">Your wishlist is empty. <a href="/">Browse products</a> to add items!</p>
+            <p class="wishlist-empty">Your wishlist is empty. <a href="{% url 'product_list' %}">Browse products</a> to add items!</p>
         {% endif %}
     </div>
 </main>

@@ -471,3 +471,7 @@ def checkout(request):
 
     pdf.save()
     return response
+
+
+def about (request):
+    return render(request, 'about.html')
