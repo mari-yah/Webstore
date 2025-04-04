@@ -6,7 +6,7 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
-    <h1 class="hero-title">Shop</h1>
+    <h1 class="hero-title" style="color:white">Shop</h1>
     <p class="hero-description">Explore our exclusive range of products</p>
 </section>
 
@@ -79,9 +79,11 @@
         <div class="product-card" data-category="{{ product.category }}" 
              data-brand="{{product.brand}}" data-type="{{ product.type }}" 
              data-price="{{ product.price }}" data-rating="{{ product.rating }}">
-            <img src="{{ product.image.url }}" alt="{{ product.product_name }}">
-            <h3>{{ product.product_name }}</h3>
-            <p class="price">₹{{ product.price }}</p>
+             <a href="{% url 'product_detail' product.product_id %}" class="product-link">
+                <img src="{{ product.image.url }}" alt="{{ product.product_name }}" class="product-image" loading="lazy">
+                <h2 class="product-name">{{ product.product_name }}</h2>
+                <p class="product-price">₹{{ product.price }}</p>
+            </a>
             <p class="rating">⭐ {{ product.rating }}</p>
             
             <div class="product-actions">
@@ -149,48 +151,52 @@ function applyFilters(category, brand) {
 }
 
 
-    function confirmAddToCart(productId) {
-        let popup = document.getElementById("cart-popup");
-        if (!popup) return;
+function confirmAddToCart(productId) {
+    let popup = document.getElementById("cart-popup");
+    if (!popup) return;
 
-        popup.style.display = "block";
-        popup.style.opacity = "1";
+    popup.style.display = "block";
+    popup.style.opacity = "1";
 
-        setTimeout(function () {
-            popup.style.opacity = "0";
-            setTimeout(() => { popup.style.display = "none"; }, 500);
-        }, 2000);
+    setTimeout(function () {
+        popup.style.opacity = "0";
+        setTimeout(() => { popup.style.display = "none"; }, 500);
+    }, 2000);
 
-        setTimeout(function () {
-            document.getElementById("addToCartForm_" + productId).submit();
-        }, 500);
-    }
-</script>
-
-<script>
-    function confirmAddToWishlist(productId) {
-        console.log("Add to Wishlist button clicked for product ID:", productId); // ✅ Debugging Log
-    
-        let popup = document.getElementById("wishlist-popup-" + productId); // ✅ Select correct product-specific popup
-    
-        if (!popup) {
-            console.error("Wishlist pop-up element not found for product ID:", productId); // ✅ Debugging Error
-            return;
+    // Submit form via AJAX instead of reloading
+    fetch(document.getElementById("addToCartForm_" + productId).action, {
+        method: "POST",
+        body: new FormData(document.getElementById("addToCartForm_" + productId))
+    }).then(response => {
+        if (!response.ok) {
+            console.error("Failed to add item to cart.");
         }
-    
-        popup.style.display = "block"; // ✅ Show pop-up
-        popup.style.opacity = "1";     // ✅ Ensure visibility
-    
-        setTimeout(function () {
-            popup.style.opacity = "0";  // ✅ Fade out effect
-            setTimeout(() => { popup.style.display = "none"; }, 500); // ✅ Hide completely
-        }, 5000);
-    
-        // ✅ Submit form after showing pop-up
-        setTimeout(function () {
-            document.getElementById("addToWishlistForm_" + productId).submit();
-        }, 500);
-    }
+    }).catch(error => console.error(error));
+}
+
+function confirmAddToWishlist(productId) {
+    let popup = document.getElementById("wishlist-popup-" + productId);
+    if (!popup) return;
+
+    popup.style.display = "block";
+    popup.style.opacity = "1";
+
+    setTimeout(function () {
+        popup.style.opacity = "0";
+        setTimeout(() => { popup.style.display = "none"; }, 500);
+    }, 5000);
+
+    // Submit form via AJAX instead of reloading
+    fetch(document.getElementById("addToWishlistForm_" + productId).action, {
+        method: "POST",
+        body: new FormData(document.getElementById("addToWishlistForm_" + productId))
+    }).then(response => {
+        if (!response.ok) {
+            console.error("Failed to add item to wishlist.");
+        }
+    }).catch(error => console.error(error));
+}
+
     
     </script>
     
@@ -269,3 +275,5 @@ function applyFilters(category, brand) {
 <script src="{% static 'js/filter.js' %}"></script>
 
 {% endblock %}
+
+

@@ -43,6 +43,10 @@
     </table>
 
     <p class="total-price"><strong>Total:</strong> ₹<span id="total-price">{{ total_price|floatformat:2 }}</span></p>
+    {% if bargain %}
+    <p class="discount-info"><strong>Discount Applied:</strong> {{ bargain.discount }}%</p>
+    <p class="final-price"><strong>Final Price:</strong> ₹{{ bargain.final_price|floatformat:2 }}</p>
+    {% endif %}
     
     <div class="cart-buttons">
         <form action="{% url 'clear_cart' %}" method="post">

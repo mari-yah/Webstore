@@ -33,6 +33,7 @@
             <div class="product-actions">
                 <!-- Add to Wishlist Form -->
                 <form id="addToWishlistForm_{{ product.product_id }}" action="{% url 'add_to_wishlist' product.product_id %}" method="post">
+                    
                     {% csrf_token %}
                     <button type="button" class="action-button add-to-wishlist" onclick="confirmAddToWishlist('{{ product.product_id }}')">
                         <i class="fas fa-heart"></i> <span>Add to Wishlist</span>
@@ -59,29 +60,29 @@
 
 <!-- Script for Popup and Form Submission -->
 <script>
-    function showPopup(message) {
-        const popup = document.getElementById('popup');
-        const popupMessage = document.getElementById('popup-message');
+    function confirmAddToCart(productId) {
+        console.log("Add to Cart button clicked for product ID:", productId); // ✅ Debugging Log
+
+        let popup = document.getElementById("cart-popup");
         
-        popupMessage.textContent = message;
-        popup.classList.add('active');
+        if (!popup) {
+            console.error("Pop-up element not found!"); // ✅ Debugging Error
+            return;
+        }
 
-        // Auto close the popup after 2 seconds
-        setTimeout(closePopup, 2000);
-    }
+        popup.style.display = "block"; // ✅ Show pop-up
+        popup.style.opacity = "1";     // ✅ Ensure visibility
 
-    function showPopupAndSubmit(message) {
-        showPopup(message);
+        
+        setTimeout(function () {
+            popup.style.opacity = "0";  // ✅ Fade out effect
+            setTimeout(() => { popup.style.display = "none"; }, 500); // Hide completely
+        }, 5000);
 
-        // Delay form submission to show the popup first
-        setTimeout(function() {
-            document.getElementById('addToCartForm').submit();
-        }, 2000); // Wait 2 seconds before submitting
-    }
-
-    function closePopup() {
-        const popup = document.getElementById('popup');
-        popup.classList.remove('active');
+        // ✅ Submit form after showing pop-up
+        setTimeout(function () {
+            document.getElementById("addToCartForm_" + productId).submit();
+        }, 500);
     }
 </script>
 

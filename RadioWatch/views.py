@@ -101,8 +101,9 @@ def logout_view(request):
 def cart(request):
     cart_items = []
     total_price = 0
-    customer_id = None  # Default value to prevent empty string errors
-    
+    customer_id = None  
+    bargain_data = None  # ✅ Ensure it's always defined
+
     if request.user.is_authenticated:
         user = request.user
         user_cart = Cart.objects.filter(user=user)
@@ -117,9 +118,8 @@ def cart(request):
             })
             total_price += item.product.price * item.quantity
         
-        # Fix: Ensure customer_id is always an integer or None
         customer = Customer.objects.filter(user_id=user.user_id).first()
-        customer_id = customer.customer_id if customer else 0  # Use 0 instead of ''
+        customer_id = customer.customer_id if customer else 0  
     else:
         cart = request.session.get('cart', {})
         
@@ -134,11 +134,16 @@ def cart(request):
             })
             total_price += product.price * quantity
 
+    # ✅ Always fetch bargain data (inside or outside the `else` block)
+    bargain_data = request.session.get('bargain_discount', None)
+
     return render(request, 'cart.html', {
         'cart_items': cart_items,
         'total_price': total_price,
-        'customer_id': customer_id  # Ensure this is always valid
+        'customer_id': customer_id,
+        'bargain': bargain_data  # ✅ This is now always defined
     })
+
 
 
 
