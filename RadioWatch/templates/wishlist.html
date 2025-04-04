@@ -127,6 +127,20 @@
     .wishlist-empty a:hover {
         text-decoration: underline;
     }
+
+    .wishlist-item-name {
+    text-decoration: none;
+    color: #444;
+    font-size: 20px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.wishlist-item-name:hover {
+    text-decoration: underline;
+    color: #000;
+}
 </style>
 
 <main class="wishlist-page">
@@ -137,10 +151,16 @@
             <div class="wishlist-grid">
                 {% for item in wishlist_items %}
                 <div class="wishlist-item">
-                    <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                    <a href="{% url 'product_detail' item.product_id %}">
+                        <img src="{{ item.image.url }}" alt="{{ item.name }}">
+                    </a>
+                    
                     <div class="wishlist-item-details">
-                        <p class="wishlist-item-name">{{ item.name }}</p>
+                        <a href="{% url 'product_detail' item.product_id %}" class="wishlist-item-name">
+                            {{ item.name }}
+                        </a>
                         <p class="wishlist-item-price">₹{{ item.price|floatformat:2 }}</p>
+                    
                         <div class="wishlist-buttons">
                             <form id="addToCartForm_{{ item.product_id }}" action="{% url 'add_to_cart' item.product_id %}" method="post">
                                 {% csrf_token %}

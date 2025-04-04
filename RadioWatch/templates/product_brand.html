@@ -28,6 +28,7 @@
                         <div class="product-actions">
                             <!-- Add to Wishlist Form -->
                             <form id="addToWishlistForm_{{ product.product_id }}" action="{% url 'add_to_wishlist' product.product_id %}" method="post">
+                                
                                 {% csrf_token %}
                                 <button type="button" class="action-button add-to-wishlist" onclick="confirmAddToWishlist('{{ product.product_id }}')">
                                     <i class="fas fa-heart"></i> <span>Add to Wishlist</span>

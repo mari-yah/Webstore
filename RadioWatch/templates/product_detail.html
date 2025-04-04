@@ -17,23 +17,35 @@
         <p class="product-description"><strong>Description:</strong> {{ product.description }}</p>
         <p class="product-price"><strong>Price:</strong> ₹{{ product.price }}</p>
 
-        <div class="action-buttons">
+        <div class="product-actions">
             <!-- Add to Cart Form -->
-            <form id="addToCartForm" action="{% url 'add_to_cart' product.product_id %}" method="post">
+            <form id="addToCartForm_{{ product.product_id }}" action="{% url 'add_to_cart' product.product_id %}" method="post">
                 {% csrf_token %}
-                <button type="button" class="action-button add-to-cart" 
-                        onclick="showPopupAndSubmit('Item added to cart!')">
-                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                <button type="button" class="action-button add-to-cart" onclick="confirmAddToCart('{{ product.product_id }}')">
+                    <i class="fas fa-shopping-cart"></i> <span>Add to Cart</span>
                 </button>
             </form>
 
-                        <!-- Wishlist Pop-up -->
-                        <div id="wishlist-popup-{{ product.product_id }}" class="wishlist-popup">
-                            <p>Item added to Wishlist!</p>
-                        </div>
-                    </div>  <!-- Closing product-actions -->
-                </div>  <!-- Closing product-item -->
-                {% endfor %}
+            <div id="cart-popup" class="cart-popup">
+                <p>Item added to cart!</p>
+            </div>
+
+            <div class="product-actions">
+                <!-- Add to Wishlist Form -->
+                <form id="addToWishlistForm_{{ product.product_id }}" action="{% url 'add_to_wishlist' product.product_id %}" method="post">
+                    {% csrf_token %}
+                    <button type="button" class="action-button add-to-wishlist" onclick="confirmAddToWishlist('{{ product.product_id }}')">
+                        <i class="fas fa-heart"></i> <span>Add to Wishlist</span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Wishlist Pop-up -->
+            <div id="wishlist-popup-{{ product.product_id }}" class="wishlist-popup">
+                <p>Item added to Wishlist!</p>
+            </div>
+        </div>  <!-- Closing product-actions -->
+    </div>  <!-- Closing product-item -->
 
 
 <!-- Popup Element -->
